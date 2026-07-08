@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+<title id="title">Jazz Hands Voicing</title>
+<desc id="desc">Jazz voicings, stylish quote</desc>
+<rect width="400" height="400" rx="10" fill="#fffaf0"/>
+<path d="M0 0 H400 V400 H0Z" fill="#fffaf0"/>
+<circle cx="24" cy="38" r="6" fill="#d7b6ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="51" cy="106" r="7" fill="#ffe45c" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="78" cy="174" r="8" fill="#38d9a9" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="105" cy="242" r="9" fill="#ff6b6b" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="132" cy="310" r="6" fill="#4dabf7" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="159" cy="38" r="7" fill="#d7b6ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="186" cy="106" r="8" fill="#ffe45c" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="213" cy="174" r="9" fill="#38d9a9" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="240" cy="242" r="6" fill="#ff6b6b" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="267" cy="310" r="7" fill="#4dabf7" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="294" cy="38" r="8" fill="#d7b6ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="321" cy="106" r="9" fill="#ffe45c" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="348" cy="174" r="6" fill="#38d9a9" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="375" cy="242" r="7" fill="#ff6b6b" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="402" cy="310" r="8" fill="#4dabf7" stroke="#151515" stroke-width="3" opacity=".28"/>
+<path d="M28 28 H372 V372 H28Z" fill="none" stroke="#151515" stroke-width="6" stroke-dasharray="14 10"/>
+<g transform="translate(200 178)"><path d="M-92 24 C-130-34-70-80-34-22 L-20 0 L-18-88 C-18-118 18-118 18-88 L20 0 L36-34 C66-84 124-44 96 18 C76 64 44 98 0 108 C-42 98-72 68-92 24Z" fill="#d7b6ff" stroke="#151515" stroke-width="6"/><circle cx="-78" cy="-96" r="18" fill="#ff6b6b" stroke="#151515" stroke-width="4"/><circle cx="86" cy="-82" r="14" fill="#ffe45c" stroke="#151515" stroke-width="4"/></g><text x="200" y="358" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="16" fill="#151515">JAZZ HANDS VOICING</text>
+<g transform="translate(200 54)">
+<rect x="-152" y="-23" width="304" height="46" rx="4" fill="#4dabf7" stroke="#151515" stroke-width="5"/>
+<text x="0" y="7" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#151515">ADD9, ADD COFFEE</text>
+</g>
+</svg>

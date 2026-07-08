@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+<title id="title">Eminem RapGod</title>
+<desc id="desc">Trucker cap and hoodie collar contour</desc>
+<rect width="400" height="400" rx="10" fill="#fff8e8"/>
+<path d="M0 0 H400 V400 H0Z" fill="#fff8e8"/>
+<circle cx="24" cy="38" r="6" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="51" cy="106" r="7" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="78" cy="174" r="8" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="105" cy="242" r="9" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="132" cy="310" r="6" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="159" cy="38" r="7" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="186" cy="106" r="8" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="213" cy="174" r="9" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="240" cy="242" r="6" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="267" cy="310" r="7" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="294" cy="38" r="8" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="321" cy="106" r="9" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="348" cy="174" r="6" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="375" cy="242" r="7" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="402" cy="310" r="8" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/>
+<path d="M28 28 H372 V372 H28Z" fill="none" stroke="#151515" stroke-width="6" stroke-dasharray="14 10"/>
+
+        <g transform="translate(200 178)">
+          <path d="M-46 20 C-46-30 46-30 46 20 Z" fill="#151515"/>
+          <path d="M-54 12 C-20 28 20 28 54 12" fill="none" stroke="#151515" stroke-width="10" stroke-linecap="round"/>
+          <path d="M-50 65 L-35 110 L35 110 L50 65 C30 75-30 75-50 65 Z" fill="#4ee6b8" stroke="#151515" stroke-width="4"/>
+        </g>
+      <text x="200" y="358" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="16" fill="#151515">EMINEM RAPGOD</text>
+<g transform="translate(200 54)">
+<rect x="-152" y="-23" width="304" height="46" rx="4" fill="#ffd84d" stroke="#151515" stroke-width="5"/>
+<text x="0" y="7" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#151515">YOU ONLY GET ONE SHOT, DO NOT MISS YOUR CHANCE</text>
+</g>
+</svg>

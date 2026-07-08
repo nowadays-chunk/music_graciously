@@ -1,0 +1,42 @@
+<svg width="900" height="660" viewBox="0 0 900 660" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Neo-brutalist guitar sheets hero</title>
+  <desc id="desc">Colorful sheets, guitar neck blocks, arrows, and music notes in a thick outlined style.</desc>
+  <rect x="74" y="72" width="640" height="430" fill="#23A094" stroke="#111111" stroke-width="8"/>
+  <rect x="118" y="34" width="640" height="430" fill="#FFFDF5" stroke="#111111" stroke-width="8"/>
+  <rect x="152" y="72" width="258" height="310" fill="#FFC900" stroke="#111111" stroke-width="7"/>
+  <rect x="444" y="72" width="258" height="310" fill="#FF90E8" stroke="#111111" stroke-width="7"/>
+  <path d="M180 118H374" stroke="#111111" stroke-width="6"/>
+  <path d="M180 162H374" stroke="#111111" stroke-width="6"/>
+  <path d="M180 206H374" stroke="#111111" stroke-width="6"/>
+  <path d="M180 250H374" stroke="#111111" stroke-width="6"/>
+  <path d="M180 294H374" stroke="#111111" stroke-width="6"/>
+  <path d="M220 88V348" stroke="#111111" stroke-width="6"/>
+  <path d="M270 88V348" stroke="#111111" stroke-width="6"/>
+  <path d="M320 88V348" stroke="#111111" stroke-width="6"/>
+  <circle cx="270" cy="162" r="15" fill="#90A8ED" stroke="#111111" stroke-width="6"/>
+  <circle cx="320" cy="250" r="15" fill="#FF7051" stroke="#111111" stroke-width="6"/>
+  <path d="M484 118H664" stroke="#111111" stroke-width="6"/>
+  <path d="M484 162H664" stroke="#111111" stroke-width="6"/>
+  <path d="M484 206H664" stroke="#111111" stroke-width="6"/>
+  <path d="M484 250H664" stroke="#111111" stroke-width="6"/>
+  <path d="M484 294H664" stroke="#111111" stroke-width="6"/>
+  <path d="M524 88V348" stroke="#111111" stroke-width="6"/>
+  <path d="M574 88V348" stroke="#111111" stroke-width="6"/>
+  <path d="M624 88V348" stroke="#111111" stroke-width="6"/>
+  <circle cx="524" cy="206" r="15" fill="#FFC900" stroke="#111111" stroke-width="6"/>
+  <circle cx="624" cy="118" r="15" fill="#23A094" stroke="#111111" stroke-width="6"/>
+  <rect x="224" y="418" width="428" height="82" fill="#90A8ED" stroke="#111111" stroke-width="7"/>
+  <path d="M270 459H572" stroke="#111111" stroke-width="7" stroke-linecap="square"/>
+  <path d="M548 432L586 459L548 486" fill="#FF7051" stroke="#111111" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="112" cy="548" r="42" fill="#FFC900" stroke="#111111" stroke-width="7"/>
+  <path d="M96 550C106 522 130 522 130 550C130 574 96 574 96 550Z" fill="#FF90E8" stroke="#111111" stroke-width="6"/>
+  <rect x="664" y="448" width="142" height="114" fill="#FF7051" stroke="#111111" stroke-width="7" transform="rotate(-8 664 448)"/>
+  <path d="M704 486L774 476" stroke="#111111" stroke-width="6"/>
+  <path d="M708 520L778 510" stroke="#111111" stroke-width="6"/>
+  <path d="M704 552L748 546" stroke="#111111" stroke-width="6"/>
+  <path d="M70 174L32 132L84 118" fill="#90A8ED" stroke="#111111" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M792 116L854 86L846 154" fill="#23A094" stroke="#111111" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M770 244C810 222 842 246 820 284C792 330 720 282 770 244Z" fill="#FFC900" stroke="#111111" stroke-width="7"/>
+  <path d="M786 256L828 300" stroke="#111111" stroke-width="6"/>
+  <path d="M828 256L786 300" stroke="#111111" stroke-width="6"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg width="220" height="160" viewBox="0 0 220 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Search spark graphic</title>
+  <desc id="desc">A colored magnifier and fretboard spark graphic.</desc>
+  <rect x="16" y="22" width="144" height="90" fill="#FFFDF5" stroke="#111111" stroke-width="6"/>
+  <path d="M38 48H126" stroke="#111111" stroke-width="5"/>
+  <path d="M38 72H126" stroke="#111111" stroke-width="5"/>
+  <path d="M38 96H126" stroke="#111111" stroke-width="5"/>
+  <circle cx="74" cy="72" r="12" fill="#FFC900" stroke="#111111" stroke-width="5"/>
+  <circle cx="134" cy="88" r="34" fill="#90A8ED" stroke="#111111" stroke-width="6"/>
+  <path d="M158 112L202 148" stroke="#111111" stroke-width="12" stroke-linecap="square"/>
+  <path d="M174 26L186 48L210 54L190 68L192 92L174 76L150 84L160 62L146 42L170 44L174 26Z" fill="#FF90E8" stroke="#111111" stroke-width="5" stroke-linejoin="round"/>
+</svg>

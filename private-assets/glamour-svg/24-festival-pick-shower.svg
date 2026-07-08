@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+<title id="title">Festival Pick Shower</title>
+<desc id="desc">Crowd, flying guitar picks</desc>
+<rect width="400" height="400" rx="10" fill="#fff8e8"/>
+<path d="M0 0 H400 V400 H0Z" fill="#fff8e8"/>
+<circle cx="24" cy="38" r="6" fill="#f72585" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="51" cy="106" r="7" fill="#f9c74f" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="78" cy="174" r="8" fill="#90be6d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="105" cy="242" r="9" fill="#577590" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="132" cy="310" r="6" fill="#f8961e" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="159" cy="38" r="7" fill="#f72585" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="186" cy="106" r="8" fill="#f9c74f" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="213" cy="174" r="9" fill="#90be6d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="240" cy="242" r="6" fill="#577590" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="267" cy="310" r="7" fill="#f8961e" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="294" cy="38" r="8" fill="#f72585" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="321" cy="106" r="9" fill="#f9c74f" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="348" cy="174" r="6" fill="#90be6d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="375" cy="242" r="7" fill="#577590" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="402" cy="310" r="8" fill="#f8961e" stroke="#151515" stroke-width="3" opacity=".28"/>
+<path d="M28 28 H372 V372 H28Z" fill="none" stroke="#151515" stroke-width="6" stroke-dasharray="14 10"/>
+<g transform="translate(200 178)"><path d="M0-125 C92-125 122-48 76 80 C42 154-42 154-76 80 C-122-48-92-125 0-125Z" fill="#f72585" stroke="#151515" stroke-width="7"/><path d="M-48-36 L48 54 M48-36 L-48 54" stroke="#577590" stroke-width="14" stroke-linecap="round"/><circle r="24" fill="#fff8e8" stroke="#151515" stroke-width="5"/></g><text x="200" y="358" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="16" fill="#151515">FESTIVAL PICK SHOWER</text>
+<g transform="translate(200 54)">
+<rect x="-152" y="-23" width="304" height="46" rx="4" fill="#f9c74f" stroke="#151515" stroke-width="5"/>
+<text x="0" y="7" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#151515">FREE PICKS, EXPENSIVE TONE</text>
+</g>
+</svg>

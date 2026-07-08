@@ -1,0 +1,16 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Guitar Sheets colorful mark</title>
+  <desc id="desc">A colorful neo-brutalist guitar fretboard badge.</desc>
+  <rect x="10" y="18" width="116" height="116" fill="#FF90E8" stroke="#111111" stroke-width="7"/>
+  <rect x="34" y="40" width="116" height="102" fill="#FFC900" stroke="#111111" stroke-width="7"/>
+  <path d="M54 54H128" stroke="#111111" stroke-width="5" stroke-linecap="square"/>
+  <path d="M54 70H128" stroke="#111111" stroke-width="5" stroke-linecap="square"/>
+  <path d="M54 86H128" stroke="#111111" stroke-width="5" stroke-linecap="square"/>
+  <path d="M54 102H128" stroke="#111111" stroke-width="5" stroke-linecap="square"/>
+  <path d="M66 43V126" stroke="#111111" stroke-width="5" stroke-linecap="square"/>
+  <path d="M86 43V126" stroke="#111111" stroke-width="5" stroke-linecap="square"/>
+  <path d="M106 43V126" stroke="#111111" stroke-width="5" stroke-linecap="square"/>
+  <circle cx="86" cy="70" r="8" fill="#23A094" stroke="#111111" stroke-width="5"/>
+  <circle cx="106" cy="102" r="8" fill="#90A8ED" stroke="#111111" stroke-width="5"/>
+  <path d="M22 118L42 140L54 116" fill="#FF7051" stroke="#111111" stroke-width="6" stroke-linejoin="round"/>
+</svg>

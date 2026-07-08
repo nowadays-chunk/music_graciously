@@ -1,0 +1,15 @@
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Colorful neo-brutalist music pattern</title>
+  <desc id="desc">A decorative pattern of musical shapes with thick black outlines.</desc>
+  <rect x="8" y="16" width="64" height="64" fill="#FFC900" stroke="#111111" stroke-width="5"/>
+  <circle cx="132" cy="48" r="34" fill="#FF90E8" stroke="#111111" stroke-width="5"/>
+  <path d="M214 18L288 34L248 92Z" fill="#90A8ED" stroke="#111111" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M44 120H138" stroke="#111111" stroke-width="5"/>
+  <path d="M44 144H138" stroke="#111111" stroke-width="5"/>
+  <path d="M74 104V160" stroke="#111111" stroke-width="5"/>
+  <path d="M108 104V160" stroke="#111111" stroke-width="5"/>
+  <circle cx="74" cy="144" r="10" fill="#23A094" stroke="#111111" stroke-width="5"/>
+  <circle cx="108" cy="120" r="10" fill="#FF7051" stroke="#111111" stroke-width="5"/>
+  <rect x="178" y="104" width="104" height="54" fill="#23A094" stroke="#111111" stroke-width="5"/>
+  <path d="M202 132H254" stroke="#111111" stroke-width="5"/>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+<title id="title">Chopin Nocturne</title>
+<desc id="desc">Left-facing profile with swept-back hair silhouette</desc>
+<rect width="400" height="400" rx="10" fill="#fff8e8"/>
+<path d="M0 0 H400 V400 H0Z" fill="#fff8e8"/>
+<circle cx="24" cy="38" r="6" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="51" cy="106" r="7" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="78" cy="174" r="8" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="105" cy="242" r="9" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="132" cy="310" r="6" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="159" cy="38" r="7" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="186" cy="106" r="8" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="213" cy="174" r="9" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="240" cy="242" r="6" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="267" cy="310" r="7" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="294" cy="38" r="8" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="321" cy="106" r="9" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="348" cy="174" r="6" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="375" cy="242" r="7" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="402" cy="310" r="8" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/>
+<path d="M28 28 H372 V372 H28Z" fill="none" stroke="#151515" stroke-width="6" stroke-dasharray="14 10"/>
+
+        <g transform="translate(200 178)">
+          <path d="M40 78 C40-40-10-40-10 10 L-30 18 L-10 24 L-14 36 L-4 36 C-4 55 12 78 40 78 Z" fill="#151515"/>
+          <path d="M12-28 C30-60 65-30 48 30 C38-5 20-15 12-28" fill="#4ee6b8" stroke="#151515" stroke-width="3"/>
+        </g>
+      <text x="200" y="358" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="16" fill="#151515">CHOPIN NOCTURNE</text>
+<g transform="translate(200 54)">
+<rect x="-152" y="-23" width="304" height="46" rx="4" fill="#ffd84d" stroke="#151515" stroke-width="5"/>
+<text x="0" y="7" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#151515">SIMPLICITY IS THE FINAL ACHIEVEMENT</text>
+</g>
+</svg>

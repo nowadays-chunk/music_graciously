@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+<title id="title">Kurt Cobain Grunge</title>
+<desc id="desc">Messy long hair and oval grunge sunglasses</desc>
+<rect width="400" height="400" rx="10" fill="#fff8e8"/>
+<path d="M0 0 H400 V400 H0Z" fill="#fff8e8"/>
+<circle cx="24" cy="38" r="6" fill="#f72585" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="51" cy="106" r="7" fill="#f9c74f" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="78" cy="174" r="8" fill="#90be6d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="105" cy="242" r="9" fill="#577590" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="132" cy="310" r="6" fill="#f8961e" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="159" cy="38" r="7" fill="#f72585" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="186" cy="106" r="8" fill="#f9c74f" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="213" cy="174" r="9" fill="#90be6d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="240" cy="242" r="6" fill="#577590" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="267" cy="310" r="7" fill="#f8961e" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="294" cy="38" r="8" fill="#f72585" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="321" cy="106" r="9" fill="#f9c74f" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="348" cy="174" r="6" fill="#90be6d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="375" cy="242" r="7" fill="#577590" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="402" cy="310" r="8" fill="#f8961e" stroke="#151515" stroke-width="3" opacity=".28"/>
+<path d="M28 28 H372 V372 H28Z" fill="none" stroke="#151515" stroke-width="6" stroke-dasharray="14 10"/>
+
+        <g transform="translate(200 178)">
+          <path d="M-52 75 L-56-40 C-40-76 40-76 56-40 L52 75 C40 50 24 60 24 30 L-24 30 C-24 60-40 50-52 75 Z" fill="#f9c74f" stroke="#151515" stroke-width="5"/>
+          <rect x="-42" y="-10" width="34" height="24" rx="12" fill="#fff8e8" stroke="#151515" stroke-width="5"/>
+          <ellipse cx="-25" cy="2" rx="10" ry="7" fill="#151515"/>
+          <rect x="8" y="-10" width="34" height="24" rx="12" fill="#fff8e8" stroke="#151515" stroke-width="5"/>
+          <ellipse cx="25" cy="2" rx="10" ry="7" fill="#151515"/>
+          <line x1="-8" y1="2" x2="8" y2="2" stroke="#151515" stroke-width="6"/>
+        </g>
+      <text x="200" y="358" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="16" fill="#151515">KURT COBAIN GRUNGE</text>
+<g transform="translate(200 54)">
+<rect x="-152" y="-23" width="304" height="46" rx="4" fill="#f9c74f" stroke="#151515" stroke-width="5"/>
+<text x="0" y="7" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#151515">WANTING TO BE SOMEONE ELSE IS A WASTE OF WHO YOU ARE</text>
+</g>
+</svg>

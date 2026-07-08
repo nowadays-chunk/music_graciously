@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+<title id="title">Bob Dylan Folk</title>
+<desc id="desc">Curly hair and harmonica holder silhouette</desc>
+<rect width="400" height="400" rx="10" fill="#fff8e8"/>
+<path d="M0 0 H400 V400 H0Z" fill="#fff8e8"/>
+<circle cx="24" cy="38" r="6" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="51" cy="106" r="7" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="78" cy="174" r="8" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="105" cy="242" r="9" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="132" cy="310" r="6" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="159" cy="38" r="7" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="186" cy="106" r="8" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="213" cy="174" r="9" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="240" cy="242" r="6" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="267" cy="310" r="7" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="294" cy="38" r="8" fill="#55a7ff" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="321" cy="106" r="9" fill="#ff4fa3" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="348" cy="174" r="6" fill="#4ee6b8" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="375" cy="242" r="7" fill="#ffd84d" stroke="#151515" stroke-width="3" opacity=".28"/><circle cx="402" cy="310" r="8" fill="#ff8a3d" stroke="#151515" stroke-width="3" opacity=".28"/>
+<path d="M28 28 H372 V372 H28Z" fill="none" stroke="#151515" stroke-width="6" stroke-dasharray="14 10"/>
+
+        <g transform="translate(200 178)">
+          <circle cx="48" cy="0" r="22" fill="#151515"/><circle cx="41.569219381653056" cy="20.999999999999996" r="22" fill="#151515"/><circle cx="24.000000000000007" cy="36.373066958946424" r="22" fill="#151515"/><circle cx="2.9391523179536475e-15" cy="42" r="22" fill="#151515"/><circle cx="-23.99999999999999" cy="36.373066958946424" r="22" fill="#151515"/><circle cx="-41.569219381653056" cy="20.999999999999996" r="22" fill="#151515"/><circle cx="-48" cy="5.143516556418883e-15" r="22" fill="#151515"/><circle cx="-41.569219381653056" cy="-21.000000000000004" r="22" fill="#151515"/><circle cx="-24.00000000000002" cy="-36.37306695894642" r="22" fill="#151515"/><circle cx="-8.817456953860943e-15" cy="-42" r="22" fill="#151515"/><circle cx="24.000000000000007" cy="-36.373066958946424" r="22" fill="#151515"/><circle cx="41.56921938165304" cy="-21.000000000000018" r="22" fill="#151515"/>
+          <rect x="-42" y="-12" width="34" height="24" rx="4" fill="#151515"/>
+          <rect x="8" y="-12" width="34" height="24" rx="4" fill="#151515"/>
+          <line x1="-8" y1="-5" x2="8" y2="-5" stroke="#151515" stroke-width="6"/>
+          <path d="M-60 55 L-60 110 L60 110 L60 55" fill="none" stroke="#55a7ff" stroke-width="6" stroke-linecap="round"/>
+          <rect x="-30" y="96" width="60" height="10" fill="#ffd84d" stroke="#151515" stroke-width="3"/>
+        </g>
+      <text x="200" y="358" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="16" fill="#151515">BOB DYLAN FOLK</text>
+<g transform="translate(200 54)">
+<rect x="-152" y="-23" width="304" height="46" rx="4" fill="#ff8a3d" stroke="#151515" stroke-width="5"/>
+<text x="0" y="7" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#151515">BEING BORN IS LIKE BEING AN ACCIDENT</text>
+</g>
+</svg>
