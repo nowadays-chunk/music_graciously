@@ -5,8 +5,8 @@
  * that are rewritten here by next.config.js.
  *
  * The actual SVG files have been moved to private-assets/glamour-svg/
- * and are only accessible through the signed token route at
- * /api/secure-downloads/download?token=<JWT>
+ * and are only accessible after purchase through the FastAPI backend
+ * /api/downloads/<signed-token> route.
  */
 export default function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store');

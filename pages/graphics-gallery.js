@@ -207,6 +207,7 @@ const GraphicsGalleryPage = () => {
       format: license.format,
       svgMarkup: '',
       fileName: `${slugify(secureProduct.title)}.${license.format}`,
+      filePath: secureProduct.filePath || '',
       variantSummary: `${license.format.toUpperCase()} | secure download | ${selectedTemplate.ageRange || 'All ages'}`,
     }));
     setToastMessage(`${license.label} added to cart.`);

@@ -265,7 +265,6 @@ const CartPage = () => {
     const router = useRouter();
     const captureHandledRef = useRef(false);
     const submitLockRef = useRef(false);
-    const importFileInputRef = useRef(null);
     const downloadsTriggeredRef = useRef(false);
 
     const [formData, setFormData] = useState({
@@ -279,7 +278,6 @@ const CartPage = () => {
     const [submitError, setSubmitError] = useState('');
     const [downloadLinks, setDownloadLinks] = useState([]);
     const [paidArtworkItems, setPaidArtworkItems] = useState([]);
-    const [linksMessage, setLinksMessage] = useState('');
     const [googleReviewOptIn, setGoogleReviewOptIn] = useState(null);
     const [returnShipping, setReturnShipping] = useState(false);
 
@@ -362,6 +360,10 @@ const CartPage = () => {
             format: item.format || '',
             svgMarkup: item.svgMarkup || '',
             fileName: item.fileName || '',
+            filePath: item.filePath || '',
+            downloadPath: item.downloadPath || '',
+            assetPath: item.assetPath || '',
+            r2Key: item.r2Key || '',
             variantSummary: item.variantSummary || '',
             apparel: item.apparel || null,
         }));
@@ -424,17 +426,17 @@ const CartPage = () => {
         }
 
         const pendingItems = Array.isArray(pendingCheckout?.items) ? pendingCheckout.items : [];
-        const fallbackProductIds = pendingItems
-            .filter((item) => item?.requiresSecureDownload !== false)
-            .map((item) => String(item?.id || '').trim())
-            .filter(Boolean);
         const artworkItems = pendingItems
             .filter((item) => String(item?.productType || '').startsWith('artwork-'))
             .filter((item) => item?.svgMarkup);
 
-        let links = [];
-        if (fallbackProductIds.length > 0) {
-            links = await issueSecureLinks(orderId, buyerEmail, fallbackProductIds);
+        const links = normalizeImportedLinks(captureData?.downloads || [])
+            .map((link) => ({
+                ...link,
+                orderId: link.orderId || orderId,
+                userEmail: link.userEmail || buyerEmail,
+            }));
+        if (links.length > 0) {
             saveLinksToLocalStorage(orderId, buyerEmail, links);
         }
 
@@ -531,85 +533,6 @@ const CartPage = () => {
         ], []);
 
         window.localStorage.setItem(DOWNLOAD_LINKS_KEY, JSON.stringify(merged));
-    };
-
-    const handleExportLinksJson = () => {
-        if (typeof window === 'undefined') return;
-        const storedLinks = readStoredDownloadLinks();
-        const linksToExport = storedLinks.length > 0 ? storedLinks : downloadLinks;
-
-        if (linksToExport.length === 0) {
-            setLinksMessage('No links available to export yet.');
-            return;
-        }
-
-        const content = JSON.stringify({
-            exportedAt: new Date().toISOString(),
-            note: 'Temporary local backup of secure download links.',
-            downloads: linksToExport,
-        }, null, 2);
-
-        const blob = new Blob([content], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const dateTag = new Date().toISOString().slice(0, 10);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `download-links-${dateTag}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        setLinksMessage('Links exported as JSON.');
-    };
-
-    const openImportPicker = () => {
-        importFileInputRef.current?.click();
-    };
-
-    const handleImportLinksJson = async (event) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        try {
-            const text = await file.text();
-            const parsed = JSON.parse(text);
-            const importedLinks = normalizeImportedLinks(parsed);
-
-            if (importedLinks.length === 0) {
-                setLinksMessage('No valid download links found in this JSON file.');
-                return;
-            }
-
-            const existingLinks = readStoredDownloadLinks();
-            const merged = mergeDownloadLinks(existingLinks, importedLinks);
-            if (typeof window !== 'undefined') {
-                window.localStorage.setItem(DOWNLOAD_LINKS_KEY, JSON.stringify(merged));
-            }
-            setDownloadLinks((previousLinks) => mergeDownloadLinks(previousLinks, importedLinks));
-            setLinksMessage(`Imported ${importedLinks.length} link(s). Imports are stacked.`);
-        } catch (_error) {
-            setLinksMessage('Invalid JSON file. Import failed.');
-        } finally {
-            event.target.value = '';
-        }
-    };
-
-    const issueSecureLinks = async (orderId, email, fallbackProductIds = []) => {
-        const response = await fetch('/api/secure-downloads/issue', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ orderId, email, fallbackProductIds }),
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-            const firstMissingReason = Array.isArray(data?.missingProducts) && data.missingProducts[0]?.reason
-                ? ` First issue: ${data.missingProducts[0].reason}`
-                : '';
-            throw new Error((data?.error || 'Unable to issue secure links.') + firstMissingReason);
-        }
-
-        return Array.isArray(data?.downloads) ? data.downloads : [];
     };
 
     useEffect(() => {
@@ -785,30 +708,9 @@ const CartPage = () => {
                 {downloadLinks.length > 0 ? (
                     <>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                            Secure sheet links are valid for 7 days. You can export/import the link data as JSON to keep a local backup.
+                            Personal download links are generated by the backend and are valid for 7 days.
                         </Typography>
-
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-                            <Button variant="outlined" onClick={handleExportLinksJson}>
-                                Export Links JSON
-                            </Button>
-                            <Button variant="outlined" onClick={openImportPicker}>
-                                Import Links JSON
-                            </Button>
-                            <input
-                                ref={importFileInputRef}
-                                type="file"
-                                accept="application/json,.json"
-                                style={{ display: 'none' }}
-                                onChange={handleImportLinksJson}
-                            />
-                        </Box>
                     </>
-                ) : null}
-                {linksMessage ? (
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        {linksMessage}
-                    </Typography>
                 ) : null}
 
                 {downloadLinks.length > 0 ? (
