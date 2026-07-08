@@ -170,6 +170,7 @@ const featuredDrawerSx = (bgcolor) => ({
 const drawerItems = [
   { type: 'link', label: '🎸 Play', href: '/play', sx: featuredDrawerSx('var(--brutal-yellow)') },
   { type: 'link', label: '🎼 Generate', href: '/generate', sx: featuredDrawerSx('var(--brutal-blue)') },
+  { type: 'link', label: '🏗️ Architecture', href: '/music-architecture', sx: featuredDrawerSx('var(--brutal-orange)') },
   { type: 'link', label: '👂 Ear Training', href: '/ear-training', sx: featuredDrawerSx('var(--brutal-mint)') },
   { type: 'link', label: '🎯 Matches', href: '/matches', sx: featuredDrawerSx('var(--brutal-pink)') },
   { type: 'link', label: '🎵 Progressions', href: '/progressions', sx: featuredDrawerSx('var(--brutal-orange)') },
