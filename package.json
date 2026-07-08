@@ -10,8 +10,7 @@
     "lint": "next lint",
     "campaign:instagram": "node scripts/generate_instagram_single_posts.js",
     "instagram:publish": "node scripts/post_instagram_campaign.js",
-    "deploy": "git push origin HEAD:main --force",
-    "postbuild": "node scripts/generate-sitemap-paths.mjs && next-sitemap"
+    "deploy": "git push origin HEAD:main --force"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
