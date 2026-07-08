@@ -63,6 +63,20 @@ const navButtonSx = (color) => ({
     },
 });
 
+const authButtonSx = (bgcolor) => ({
+    flex: '0 0 auto',
+    color: 'var(--brutal-ink)',
+    fontWeight: 950,
+    fontSize: { md: '0.78rem', lg: '0.84rem' },
+    border: '3px solid var(--brutal-ink)',
+    bgcolor,
+    boxShadow: '3px 3px 0 var(--brutal-ink)',
+    px: { md: 1.15, lg: 1.55 },
+    display: { xs: 'none', md: 'inline-flex' },
+    whiteSpace: 'nowrap',
+    '&:hover': { bgcolor: 'var(--brutal-yellow)', borderColor: 'var(--brutal-ink)' },
+});
+
 const MainAppBar = ({ open, handleDrawerToggle, isHomepage = false }) => {
     const dispatch = useDispatch();
     const cartItems = useSelector(state => state.cart?.items || []);
@@ -240,6 +254,13 @@ const MainAppBar = ({ open, handleDrawerToggle, isHomepage = false }) => {
                 >
                     /
                 </Box>
+
+                <Button component={Link} href="/login" color="inherit" sx={authButtonSx('var(--brutal-paper)')}>
+                    Login
+                </Button>
+                <Button component={Link} href="/register" color="inherit" sx={authButtonSx('var(--brutal-mint)')}>
+                    Sign up
+                </Button>
 
                 <Button
                     component={Link}
