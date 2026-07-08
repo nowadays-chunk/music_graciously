@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Box, Button, Chip, Container, Divider, Grid, Paper, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  Container,
+  Dialog,
+  DialogContent,
+  Divider,
+  Grid,
+  IconButton,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+
+const DESIGN_IMAGE = '/assets/design/compelete-design-music-graciously.png';
 
 const stackRows = [
   ['Frontend web', 'Next.js on Vercel'],
@@ -96,6 +113,12 @@ const Flow = ({ items }) => (
 );
 
 export default function MusicArchitecturePage() {
+  const [designOpen, setDesignOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+
+  const zoomOut = () => setZoom((current) => Math.max(0.5, Number((current - 0.25).toFixed(2))));
+  const zoomIn = () => setZoom((current) => Math.min(3, Number((current + 0.25).toFixed(2))));
+
   return (
     <>
       <Head>
@@ -109,7 +132,7 @@ export default function MusicArchitecturePage() {
       <Box sx={{ bgcolor: 'var(--brutal-yellow)', pt: { xs: 12, md: 15 }, pb: { xs: 6, md: 9 }, borderBottom: '4px solid var(--brutal-ink)' }}>
         <Container maxWidth="xl">
           <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <Chip label="Music Graciously blueprint" sx={{ mb: 2, bgcolor: 'var(--brutal-pink)', color: 'var(--brutal-ink)' }} />
               <Typography variant="h1" sx={{ fontWeight: 950, fontSize: { xs: '3rem', md: '5.7rem' }, lineHeight: 0.92, mb: 3 }}>
                 The AI music platform design.
@@ -126,19 +149,63 @@ export default function MusicArchitecturePage() {
                 </Button>
               </Stack>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <Box
-                component="img"
-                src="/assets/design/compelete-design-music-graciously.png"
-                alt="Complete Music Graciously system architecture design"
-                sx={{
-                  width: '100%',
-                  display: 'block',
-                  bgcolor: 'var(--brutal-paper)',
-                  border: '4px solid var(--brutal-ink)',
-                  boxShadow: '10px 10px 0 var(--brutal-ink)',
-                }}
-              />
+            <Grid item xs={12} md={8}>
+              <Paper sx={{ p: { xs: 1, md: 1.5 }, bgcolor: 'var(--brutal-paper)', position: 'relative' }}>
+                <Box
+                  component="button"
+                  type="button"
+                  onClick={() => setDesignOpen(true)}
+                  aria-label="Open complete Music Graciously design in full screen"
+                  sx={{
+                    display: 'block',
+                    width: '100%',
+                    p: 0,
+                    m: 0,
+                    cursor: 'zoom-in',
+                    bgcolor: 'transparent',
+                    border: 0,
+                    textAlign: 'left',
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={DESIGN_IMAGE}
+                    alt="Complete Music Graciously system architecture design"
+                    sx={{
+                      width: '100%',
+                      minHeight: { xs: 260, md: 620 },
+                      maxHeight: { xs: 'none', md: '78vh' },
+                      objectFit: 'contain',
+                      display: 'block',
+                      bgcolor: 'var(--brutal-paper)',
+                      border: '4px solid var(--brutal-ink)',
+                      boxShadow: '10px 10px 0 var(--brutal-ink)',
+                    }}
+                  />
+                </Box>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 2 }}>
+                  <Button
+                    onClick={() => setDesignOpen(true)}
+                    variant="contained"
+                    size="large"
+                    startIcon={<OpenInFullIcon />}
+                    sx={{ fontWeight: 950 }}
+                  >
+                    View full screen and zoom
+                  </Button>
+                  <Button
+                    component="a"
+                    href={DESIGN_IMAGE}
+                    target="_blank"
+                    rel="noreferrer"
+                    variant="outlined"
+                    size="large"
+                    sx={{ bgcolor: 'var(--brutal-paper)', fontWeight: 950 }}
+                  >
+                    Open image file
+                  </Button>
+                </Stack>
+              </Paper>
             </Grid>
           </Grid>
         </Container>
@@ -285,6 +352,75 @@ export default function MusicArchitecturePage() {
           </Typography>
         </Section>
       </Container>
+
+      <Dialog
+        fullScreen
+        open={designOpen}
+        onClose={() => setDesignOpen(false)}
+        PaperProps={{ sx: { bgcolor: 'var(--brutal-bg)' } }}
+      >
+        <Box
+          sx={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 2,
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: { xs: 'stretch', md: 'center' },
+            justifyContent: 'space-between',
+            gap: 1.5,
+            p: 2,
+            bgcolor: 'var(--brutal-yellow)',
+            borderBottom: '4px solid var(--brutal-ink)',
+          }}
+        >
+          <Typography sx={{ fontWeight: 950, fontSize: { xs: '1rem', md: '1.25rem' } }}>
+            Complete Music Graciously architecture design
+          </Typography>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
+            <Button onClick={zoomOut} variant="outlined" sx={{ bgcolor: 'var(--brutal-paper)', fontWeight: 950 }}>
+              Zoom -
+            </Button>
+            <Chip label={`${Math.round(zoom * 100)}%`} sx={{ bgcolor: 'var(--brutal-paper)', fontWeight: 950 }} />
+            <Button onClick={zoomIn} variant="contained" sx={{ fontWeight: 950 }}>
+              Zoom +
+            </Button>
+            <Button onClick={() => setZoom(1)} variant="outlined" sx={{ bgcolor: 'var(--brutal-paper)', fontWeight: 950 }}>
+              Reset
+            </Button>
+            <IconButton
+              onClick={() => setDesignOpen(false)}
+              aria-label="Close full screen design viewer"
+              sx={{ bgcolor: 'var(--brutal-pink)', border: '3px solid var(--brutal-ink)', boxShadow: '3px 3px 0 var(--brutal-ink)' }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Stack>
+        </Box>
+        <DialogContent sx={{ p: { xs: 1.5, md: 4 }, overflow: 'auto' }}>
+          <Box
+            sx={{
+              minWidth: `${zoom * 100}%`,
+              width: `${zoom * 100}%`,
+              mx: 'auto',
+            }}
+          >
+            <Box
+              component="img"
+              src={DESIGN_IMAGE}
+              alt="Complete Music Graciously system architecture design enlarged full screen"
+              sx={{
+                width: '100%',
+                display: 'block',
+                bgcolor: 'var(--brutal-paper)',
+                border: '4px solid var(--brutal-ink)',
+                boxShadow: '10px 10px 0 var(--brutal-ink)',
+              }}
+            />
+          </Box>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+sS
