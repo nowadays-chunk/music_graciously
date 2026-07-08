@@ -25,7 +25,7 @@ const TermsOfService = () => {
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h5" gutterBottom fontWeight="bold">1. Ownership and Beneficiary</Typography>
                         <Typography variant="body1" paragraph>
-                            This project, the domain <strong>www.sheets.media</strong>, and all associated intellectual property are registered under the name <strong>Hamza Eljaouhari</strong>. Hamza Eljaouhari is the sole maker, maintainer, and beneficiary of this project, including all Ad revenues and product purchase proceeds.
+                            This project, the domain <strong>www.musicgraciously.com</strong>, and all associated intellectual property are registered under the name <strong>Hamza Eljaouhari</strong>. Hamza Eljaouhari is the sole maker, maintainer, and beneficiary of this project, including all Ad revenues and product purchase proceeds.
                         </Typography>
                     </Box>
 

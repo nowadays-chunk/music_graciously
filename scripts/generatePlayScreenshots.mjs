@@ -106,7 +106,7 @@ const categories = options.category === 'all'
   ? VALID_CATEGORIES
   : options.category.split(',').map(s => s.trim().toLowerCase()).filter(cat => VALID_CATEGORIES.includes(cat));
 
-const BASE_URL = options.local ? 'http://localhost:3000' : 'https://www.sheets.media';
+const BASE_URL = options.local ? 'http://localhost:3000' : 'https://www.musicgraciously.com';
 
 console.log('=== SCREENSHOT GENERATION OPTIONS ===');
 console.log('Instruments:', instruments.join(', '));
@@ -114,7 +114,7 @@ console.log('Keys:       ', keys.join(', '));
 console.log('Categories: ', categories.join(', '));
 console.log('Concurrency:', options.concurrency);
 console.log('Limit:      ', options.limit ? options.limit : 'None');
-console.log('Mode:       ', options.local ? 'Local (http://localhost:3000)' : 'Production (https://www.sheets.media)');
+console.log('Mode:       ', options.local ? 'Local (http://localhost:3000)' : 'Production (https://www.musicgraciously.com)');
 console.log('=====================================\n');
 
 if (instruments.length === 0 || keys.length === 0 || categories.length === 0) {

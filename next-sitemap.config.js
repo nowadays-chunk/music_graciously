@@ -3,7 +3,7 @@ const path = require('path');
 
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: 'https://www.sheets.media',
+  siteUrl: 'https://www.musicgraciously.com',
   generateRobotsTxt: true,
   additionalPaths: async (config) => {
     const jsonPath = path.join(__dirname, 'public', 'sitemap-paths.json');

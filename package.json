@@ -1,6 +1,6 @@
 {
   "name": "sheets-media",
-  "homepage": " https://www.sheets.media",
+  "homepage": " https://www.musicgraciously.com",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,8 +8,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "campaign:instagram": "node scripts/generate_instagram_single_posts.js",
-    "instagram:publish": "node scripts/post_instagram_campaign.js",
     "deploy": "git push origin HEAD:main --force"
   },
   "dependencies": {
