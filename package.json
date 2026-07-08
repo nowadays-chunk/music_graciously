@@ -1,14 +1,13 @@
 {
-  "name": "sheets-media",
-  "homepage": " https://www.musicgraciously.com",
+  "name": "music-graciously",
+  "homepage": "https://www.musicgraciously.com",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "deploy": "git push origin HEAD:main --force"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

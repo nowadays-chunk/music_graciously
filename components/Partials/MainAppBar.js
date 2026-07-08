@@ -32,6 +32,7 @@ const AppBarStyled = styled(AppBar, {
 const menuItems = [
     { label: '🎸 Play', href: '/play', color: 'var(--brutal-yellow)' },
     { label: '🎼 Generate', href: '/generate', color: 'var(--brutal-blue)' },
+    { label: '🏗️ Architecture', href: '/music-architecture', color: 'var(--brutal-orange)' },
     { label: '👂 Ear Training', href: '/ear-training', color: 'var(--brutal-mint)' },
     { label: '🎯 Matches', href: '/matches', color: 'var(--brutal-pink)' },
     { label: '🎵 Progressions', href: '/progressions', color: 'var(--brutal-orange)' },
@@ -142,7 +143,7 @@ const MainAppBar = ({ open, handleDrawerToggle, isHomepage = false }) => {
                 >
                     <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Box component="span" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                            GUITAR SHEETS
+                            Music Graciously
                         </Box>
                         <Box component="img" src="/graphics/guitar-sheets-mark.svg" alt="" sx={{ display: 'block', width: 52, height: 52 }} />
                     </Typography>
