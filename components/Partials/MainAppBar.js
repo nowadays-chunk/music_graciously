@@ -121,22 +121,37 @@ const MainAppBar = ({ open, handleDrawerToggle, isHomepage = false }) => {
             }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, position: 'relative', minWidth: 0 }}>
-                <IconButton
+                <Button
                     color="inherit"
-                    aria-label="open drawer"
+                    aria-label={open ? 'close navigation menu' : 'open navigation menu'}
+                    aria-expanded={open ? 'true' : 'false'}
+                    aria-controls="main-navigation-drawer"
                     onClick={handleDrawerToggle}
-                    edge="start"
+                    startIcon={<MenuIcon />}
                     sx={{
-                        mr: 2,
+                        mr: { xs: 1, sm: 2 },
+                        flex: '0 0 auto',
+                        color: 'var(--brutal-ink)',
+                        fontWeight: 950,
                         border: '3px solid var(--brutal-ink)',
                         bgcolor: open ? 'var(--brutal-pink)' : 'var(--brutal-paper)',
-                        boxShadow: '4px 4px 0 var(--brutal-ink)',
-                        display: { xs: 'inline-flex', xl: 'none' },
+                        boxShadow: open ? '2px 2px 0 var(--brutal-ink)' : '4px 4px 0 var(--brutal-ink)',
+                        minWidth: { xs: 44, sm: 'auto' },
+                        px: { xs: 1, sm: 1.5 },
+                        '& .MuiButton-startIcon': {
+                            m: { xs: 0, sm: '0 8px 0 -4px' },
+                        },
                         '&:hover': { bgcolor: 'var(--brutal-yellow)' },
+                        '&:active': {
+                            transform: 'translate(2px, 2px)',
+                            boxShadow: '1px 1px 0 var(--brutal-ink)',
+                        },
                     }}
                 >
-                    <MenuIcon />
-                </IconButton>
+                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                        Menu
+                    </Box>
+                </Button>
 
                 <Button
                     component={Link}
