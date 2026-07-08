@@ -30,13 +30,42 @@ import CartItemThumbnail from '../components/Cart/CartItemThumbnail';
 const PENDING_CHECKOUT_KEY = 'pending_checkout_context';
 const DOWNLOAD_LINKS_KEY = 'secure_download_links';
 const CART_STORAGE_KEY = 'cart_state';
-const CHECKOUT_API_BASE_URL = process.env.NEXT_PUBLIC_CHECKOUT_API_BASE_URL || process.env.NEXT_PUBLIC_PAYPAL_API_BASE_URL;
+const CHECKOUT_API_BASE_URL = process.env.NEXT_PUBLIC_CHECKOUT_API_BASE_URL;
 const CHECKOUT_CURRENCY = process.env.NEXT_PUBLIC_CHECKOUT_CURRENCY;
+const STRIPE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const GOOGLE_REVIEWS_MERCHANT_ID = Number(process.env.NEXT_PUBLIC_GOOGLE_CUSTOMER_REVIEWS_MERCHANT_ID || 5739862912);
 const GOOGLE_REVIEWS_ESTIMATED_DELIVERY_DAYS = Number(process.env.NEXT_PUBLIC_GOOGLE_CUSTOMER_REVIEWS_ESTIMATED_DELIVERY_DAYS || 1);
 const GOOGLE_REVIEWS_DEFAULT_COUNTRY = String(
     process.env.NEXT_PUBLIC_GOOGLE_CUSTOMER_REVIEWS_DEFAULT_COUNTRY || 'US'
 ).trim().toUpperCase();
+const STRIPE_SCRIPT_ID = 'stripe-js';
+
+const loadStripeJs = () => new Promise((resolve, reject) => {
+    if (typeof window === 'undefined') {
+        resolve(null);
+        return;
+    }
+
+    if (window.Stripe) {
+        resolve(window.Stripe);
+        return;
+    }
+
+    const existingScript = document.getElementById(STRIPE_SCRIPT_ID);
+    if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(window.Stripe));
+        existingScript.addEventListener('error', reject);
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.id = STRIPE_SCRIPT_ID;
+    script.src = 'https://js.stripe.com/v3/';
+    script.async = true;
+    script.onload = () => resolve(window.Stripe);
+    script.onerror = reject;
+    document.head.appendChild(script);
+});
 
 const DEFAULT_CHECKOUT_ADDRESS = {
     firstName: '',
@@ -301,7 +330,7 @@ const CartPage = () => {
     const getApiUrl = (path) => {
         const baseUrl = CHECKOUT_API_BASE_URL;
         if (!baseUrl) {
-            throw new Error('Missing NEXT_PUBLIC_CHECKOUT_API_BASE_URL (or NEXT_PUBLIC_PAYPAL_API_BASE_URL).');
+            throw new Error('Missing NEXT_PUBLIC_CHECKOUT_API_BASE_URL.');
         }
         return `${baseUrl.replace(/\/+$/, '')}${path}`;
     };
@@ -354,7 +383,7 @@ const CartPage = () => {
                 shippingAddress: checkoutAddresses.shippingAddress,
                 billingAddress: checkoutAddresses.billingAddress,
                 billingSame: checkoutAddresses.billingSame,
-                returnUrl: origin ? `${origin}/cart?checkout=success` : undefined,
+                returnUrl: origin ? `${origin}/cart?checkout=success&session_id={CHECKOUT_SESSION_ID}` : undefined,
                 cancelUrl: origin ? `${origin}/cart?checkout=cancel` : undefined,
             },
             checkoutAddresses,
@@ -381,7 +410,12 @@ const CartPage = () => {
             ? JSON.parse(window.localStorage.getItem(PENDING_CHECKOUT_KEY) || '{}')
             : {});
 
-        const capturePayerEmail = String(captureData?.payer?.email_address || '').trim().toLowerCase();
+        const capturePayerEmail = String(
+            captureData?.customer_details?.email ||
+            captureData?.customer_email ||
+            captureData?.payer?.email_address ||
+            ''
+        ).trim().toLowerCase();
         const captureCustomIdEmail = String(captureData?.purchase_units?.[0]?.custom_id || '').trim().toLowerCase();
         const buyerEmail = String(pendingCheckout?.email || capturePayerEmail || captureCustomIdEmail || '').trim().toLowerCase();
 
@@ -581,7 +615,11 @@ const CartPage = () => {
     useEffect(() => {
         if (!router.isReady || captureHandledRef.current) return;
 
-        const orderId = typeof router.query.token === 'string' ? router.query.token : '';
+        const orderId = typeof router.query.session_id === 'string'
+            ? router.query.session_id
+            : typeof router.query.token === 'string'
+                ? router.query.token
+                : '';
         const checkoutState = typeof router.query.checkout === 'string' ? router.query.checkout : '';
 
         if (!orderId && !checkoutState) return;
@@ -670,12 +708,31 @@ const CartPage = () => {
                 throw new Error(createOrderData?.error || 'Unable to create order.');
             }
 
-            const approveUrl = createOrderData?.links?.find((link) => link.rel === 'approve' || link.rel === 'payer-action')?.href;
-            if (!approveUrl) {
-                throw new Error('Unable to find PayPal approval URL (approve/payer-action).');
+            const checkoutUrl = createOrderData?.url ||
+                createOrderData?.links?.find((link) => (
+                    link.rel === 'checkout' ||
+                    link.rel === 'approve'
+                ))?.href;
+
+            if (STRIPE_PUBLISHABLE_KEY && createOrderData?.id) {
+                const stripeFactory = await loadStripeJs();
+                if (stripeFactory) {
+                    const stripeClient = stripeFactory(STRIPE_PUBLISHABLE_KEY);
+                    const redirectResult = await stripeClient.redirectToCheckout({
+                        sessionId: createOrderData.id,
+                    });
+                    if (redirectResult?.error) {
+                        throw new Error(redirectResult.error.message || 'Unable to redirect to Stripe Checkout.');
+                    }
+                    return;
+                }
             }
 
-            window.location.assign(approveUrl);
+            if (!checkoutUrl) {
+                throw new Error('Unable to find Stripe Checkout URL.');
+            }
+
+            window.location.assign(checkoutUrl);
         } catch (error) {
             setSubmitError(error?.message || 'Checkout failed. Please try again.');
             submitLockRef.current = false;
@@ -1008,7 +1065,7 @@ const CartPage = () => {
                                             Payment Method
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            PayPal Checkout
+                                            Stripe Checkout
                                         </Typography>
                                     </Grid>
                                 </Grid>
@@ -1040,10 +1097,10 @@ const CartPage = () => {
                                 </Box>
 
                                 <Button type="submit" fullWidth variant="contained" size="large" sx={{ mt: 2 }} disabled={isSubmitting}>
-                                    {isSubmitting ? 'Processing...' : `Pay with PayPal ($${total.toFixed(2)})`}
+                                    {isSubmitting ? 'Processing...' : `Pay with Stripe ($${total.toFixed(2)})`}
                                 </Button>
                                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.2 }}>
-                                    You will be redirected to PayPal to complete payment securely.
+                                    You will be redirected to Stripe to complete payment securely.
                                 </Typography>
                             </form>
                         </CardContent>

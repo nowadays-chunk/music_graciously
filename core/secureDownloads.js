@@ -259,9 +259,9 @@ export function resolveProductFileFromKey(productId, fileKey) {
 }
 
 export function getCheckoutApiBaseUrl() {
-    const baseUrl = process.env.CHECKOUT_API_BASE_URL || process.env.NEXT_PUBLIC_CHECKOUT_API_BASE_URL || process.env.NEXT_PUBLIC_PAYPAL_API_BASE_URL;
+    const baseUrl = process.env.CHECKOUT_API_BASE_URL || process.env.NEXT_PUBLIC_CHECKOUT_API_BASE_URL;
     if (!baseUrl) {
-        throw new Error('Missing CHECKOUT_API_BASE_URL (or NEXT_PUBLIC_CHECKOUT_API_BASE_URL).');
+        throw new Error('Missing CHECKOUT_API_BASE_URL (or NEXT_PUBLIC_CHECKOUT_API_BASE_URL) for the checkout backend.');
     }
     return baseUrl;
 }
