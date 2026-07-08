@@ -112,7 +112,7 @@ export default function MusicArchitecturePage() {
             <Grid item xs={12} md={6}>
               <Chip label="Music Graciously blueprint" sx={{ mb: 2, bgcolor: 'var(--brutal-pink)', color: 'var(--brutal-ink)' }} />
               <Typography variant="h1" sx={{ fontWeight: 950, fontSize: { xs: '3rem', md: '5.7rem' }, lineHeight: 0.92, mb: 3 }}>
-                The AI music platform architecture.
+                The AI music platform design.
               </Typography>
               <Typography variant="h5" sx={{ maxWidth: 760, fontWeight: 850, lineHeight: 1.45, mb: 3 }}>
                 A practical roadmap for building audio transcription, symbolic music generation, score editing, and high-quality rendering around MIDI, MusicXML, PDF, and audio exports.
