@@ -130,7 +130,7 @@ export default async function handler(req, res) {
                 const { code10 } = getMonthlyCoupons();
 
                 const bannerText = `WANT ALL GRIDS? GET THE BUNDLE AT 10% OFF! CODE: ${code10}`;
-                const storeLinkText = `VISIT: SHEETS.MEDIA/STORE`;
+                const storeLinkText = `VISIT: www.musicgraciously.com/STORE`;
                 
                 const fontSize = Math.min(10, width / 60); // Responsive font size
                 const linkWidth = font.widthOfTextAtSize(storeLinkText, fontSize);

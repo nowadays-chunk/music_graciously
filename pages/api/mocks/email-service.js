@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   if (action === 'SEND_PURCHASE_RECEIPT') {
     // Mocking purchase delivery email
-    const downloadLink = `https://sheets.media/api/download-sheet?type=${purchasedType === 'chords' ? 'chord' : purchasedType === 'scales' ? 'scale' : 'arpeggio'}&key=${key}&item=all&labelDisplay=names&format=pdf&title=${purchasedType}_bundle_${key}`;
+    const downloadLink = `https://www.musicgraciously.com/api/download-sheet?type=${purchasedType === 'chords' ? 'chord' : purchasedType === 'scales' ? 'scale' : 'arpeggio'}&key=${key}&item=all&labelDisplay=names&format=pdf&title=${purchasedType}_bundle_${key}`;
     
     const emailHtml = `
       <h1>Thank you for your purchase, ${name}!</h1>
@@ -24,13 +24,13 @@ export default async function handler(req, res) {
       <p>Need support? Reply directly to this email.</p>
     `;
 
-    console.log(`[Email Sent to ${email}] Subject: "Your Sheets.Media Order is Ready"`);
+    console.log(`[Email Sent to ${email}] Subject: "Your www.musicgraciously.com Order is Ready"`);
     console.log(`Download link: ${downloadLink}`);
 
     return res.status(200).json({
       success: true,
       message: `Receipt email dispatched to ${email}`,
-      subject: 'Your Sheets.Media Order is Ready',
+      subject: 'Your www.musicgraciously.com Order is Ready',
       bodySnippet: `Item: All ${key} ${purchasedType} Bundle`
     });
   }
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
       <p>Hope you are enjoying the <strong>All ${key} ${purchasedType} Bundle</strong>. Consistent practice makes perfect.</p>
       <p>To take your phrasing to the next level, we highly recommend adding arpeggios to your daily routine.</p>
       <p>Get our **All ${key} ${crossSellType} Bundle** at **15% off** today using code: <strong>${discountCode}</strong> at checkout.</p>
-      <p><a href="https://sheets.media/store#product-bundle-${key}-${crossSellType}" style="background: #ff4081; color: #000; padding: 8px 16px; border: 2px solid #000; text-decoration: none; font-weight: bold;">Shop the ${crossSellType} Bundle</a></p>
+      <p><a href="https://www.musicgraciously.com/store#product-bundle-${key}-${crossSellType}" style="background: #ff4081; color: #000; padding: 8px 16px; border: 2px solid #000; text-decoration: none; font-weight: bold;">Shop the ${crossSellType} Bundle</a></p>
     `;
 
     console.log(`[Scheduled Email for ${email} in 7 days] Subject: "Level up your ${key} practice - 15% discount inside"`);

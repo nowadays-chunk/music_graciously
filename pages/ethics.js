@@ -27,7 +27,7 @@ const EthicsPage = () => {
                             1. Who We Are
                         </Typography>
                         <Typography variant="body1" paragraph>
-                            <strong>Guitar Sheets Media</strong> (sheets.media) is a music theory reference platform created and maintained by <strong>Hamza Eljaouhari</strong> — a professional guitar player and software developer based between France and Morocco. We build interactive fretboard visualizers, printable sheet-music bundles, a composition engine, a circle of fifths tool, and a growing set of learning resources covering over <strong>828 musical entities</strong> across chords, scales, and arpeggios.
+                            <strong>Music Graciously</strong> (www.musicgraciously.com) is a music theory reference platform created and maintained by <strong>Hamza Eljaouhari</strong> — a professional guitar player and software developer based between France and Morocco. We build interactive fretboard visualizers, printable sheet-music bundles, a composition engine, a circle of fifths tool, and a growing set of learning resources covering over <strong>828 musical entities</strong> across chords, scales, and arpeggios.
                         </Typography>
                         <Typography variant="body1" paragraph>
                             The platform runs as a lean, statically-generated Next.js application hosted on Vercel — a deliberate "no-backend" architecture that maximises security, speed, and global reach. Our store operates through Stripe Payment Links and is fully registered with <strong>Google Merchant Center</strong>.
