@@ -15,10 +15,17 @@ import {
   Stack,
   TextField,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://fastapi-graciously.fly.dev').replace(/\/$/, '');
-const DEFAULT_STEMS = ['vocals', 'drums', 'bass', 'other'];
+const DEFAULT_STEMS = ['vocals', 'drums', 'bass', 'guitar', 'piano', 'other'];
 const FINAL_STATUSES = new Set(['completed', 'failed']);
 
 async function parseJsonResponse(response) {
@@ -131,6 +138,7 @@ export default function TranscriberPage() {
   const [userId, setUserId] = useState('anonymous');
   const [targetStem, setTargetStem] = useState('vocals');
   const [selectedStems, setSelectedStems] = useState(DEFAULT_STEMS);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [job, setJob] = useState(null);
   const [stems, setStems] = useState(null);
   const [outputs, setOutputs] = useState(null);
@@ -248,18 +256,9 @@ export default function TranscriberPage() {
                   <TextField label="Target stem" value={targetStem} onChange={(event) => setTargetStem(event.target.value)} fullWidth helperText="Example: vocals, drums, bass, other" />
 
                   <Box>
-                    <Typography sx={{ fontWeight: 900, mb: 1 }}>Requested stems</Typography>
-                    <Stack direction="row" flexWrap="wrap" gap={1}>
-                      {DEFAULT_STEMS.map((stem) => (
-                        <Chip
-                          key={stem}
-                          label={stem}
-                          color={selectedStems.includes(stem) ? 'primary' : 'default'}
-                          onClick={() => toggleStem(stem)}
-                          sx={{ fontWeight: 900 }}
-                        />
-                      ))}
-                    </Stack>
+                    <Button variant="outlined" onClick={() => setIsModalOpen(true)} sx={{ fontWeight: 900, width: '100%', border: '3px solid var(--brutal-ink)', boxShadow: '3px 3px 0 var(--brutal-ink)' }}>
+                      Configure Song Instruments ({selectedStems.length} selected)
+                    </Button>
                   </Box>
 
                   <Divider />
@@ -352,6 +351,50 @@ export default function TranscriberPage() {
           </Grid>
         </Grid>
       </Container>
+
+      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { border: '4px solid var(--brutal-ink)', boxShadow: '6px 6px 0 var(--brutal-ink)' } }}>
+        <DialogTitle sx={{ fontWeight: 950, borderBottom: '3px solid var(--brutal-ink)', bgcolor: 'var(--brutal-yellow)', color: 'var(--brutal-ink)' }}>
+          Song Instruments Setup
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          <Typography variant="body1" sx={{ mt: 1, fontWeight: 800, mb: 3, color: 'var(--brutal-ink)' }}>
+            Which instruments are present in this song? We will configure the transcription pipeline to only separate and transcribe the selected parts.
+          </Typography>
+          <FormGroup>
+            {[
+              { id: 'vocals', name: 'Vocals / Voice', desc: 'Lead, backing vocals, or choirs' },
+              { id: 'drums', name: 'Drums / Percussion', desc: 'Acoustic drum kits, electronic percussion, drum machines' },
+              { id: 'bass', name: 'Bass / Bass Guitar', desc: 'Electric bass, double bass, synth bass' },
+              { id: 'guitar', name: 'Guitar', desc: 'Acoustic, clean electric, or distorted lead guitar' },
+              { id: 'piano', name: 'Piano / Keyboards', desc: 'Acoustic piano, electric piano, synths, or keyboard leads' },
+              { id: 'other', name: 'Other Instruments', desc: 'Brass, strings, woodwinds, lead synths, sound effects' },
+            ].map((inst) => (
+              <Box key={inst.id} sx={{ mb: 2, p: 1.5, border: '2.5px solid var(--brutal-ink)', borderRadius: 1, bgcolor: selectedStems.includes(inst.id) ? 'rgba(255, 235, 59, 0.1)' : 'transparent' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedStems.includes(inst.id)}
+                      onChange={() => toggleStem(inst.id)}
+                      sx={{ color: 'var(--brutal-ink)', '&.Mui-checked': { color: 'var(--brutal-ink)' }, '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                    />
+                  }
+                  label={
+                    <Box sx={{ ml: 1 }}>
+                      <Typography sx={{ fontWeight: 950, fontSize: '1.1rem', color: 'var(--brutal-ink)' }}>{inst.name}</Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700 }}>{inst.desc}</Typography>
+                    </Box>
+                  }
+                />
+              </Box>
+            ))}
+          </FormGroup>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '3px solid var(--brutal-ink)', bgcolor: 'var(--brutal-paper)' }}>
+          <Button variant="contained" onClick={() => setIsModalOpen(false)} sx={{ fontWeight: 900, border: '2.5px solid var(--brutal-ink)', boxShadow: '3px 3px 0 var(--brutal-ink)' }}>
+            Save Selection
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

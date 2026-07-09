@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import {
   Alert,
@@ -7,360 +7,394 @@ import {
   Card,
   CardContent,
   Chip,
+  CircularProgress,
   Container,
   Divider,
+  Grid,
   LinearProgress,
   Stack,
   TextField,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_CHECKOUT_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://fastapi-graciously.fly.dev';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://fastapi-graciously.fly.dev').replace(/\/$/, '');
+const DEFAULT_STEMS = ['vocals', 'drums', 'bass', 'guitar', 'piano', 'other'];
+const FINAL_STATUSES = new Set(['completed', 'failed']);
 
-const DEFAULT_STEMS = ['vocals', 'drums', 'bass', 'other'];
-
-function buildApiUrl(path) {
-  if (!API_BASE_URL) return path;
-  return `${API_BASE_URL.replace(/\/$/, '')}${path}`;
+async function parseJsonResponse(response) {
+  const text = await response.text();
+  let payload = null;
+  try {
+    payload = text ? JSON.parse(text) : null;
+  } catch {
+    payload = { detail: text || response.statusText };
+  }
+  if (!response.ok) {
+    const message = payload?.detail || payload?.message || response.statusText || 'Request failed';
+    throw new Error(typeof message === 'string' ? message : JSON.stringify(message));
+  }
+  return payload;
 }
 
-export default function TranscriberPage() {
-  const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [targetStem, setTargetStem] = useState('vocals');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [job, setJob] = useState(null);
-  const [displayedProgress, setDisplayedProgress] = useState(0);
-  const [stems, setStems] = useState([]);
-  const [outputs, setOutputs] = useState(null);
+async function createUrlJob({ url, userId, selectedStems, targetStem }) {
+  const response = await fetch(`${API_BASE_URL}/api/transcriptions/from-url`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      url,
+      user_id: userId || 'anonymous',
+      selected_stems: selectedStems,
+      target_stem: targetStem,
+      create_pdf: true,
+      create_musicxml: true,
+    }),
+  });
+  return parseJsonResponse(response);
+}
+
+async function createUploadJob({ file, userId, selectedStems, targetStem }) {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('user_id', userId || 'anonymous');
+  form.append('selected_stems', selectedStems.join(','));
+  form.append('target_stem', targetStem);
+  const response = await fetch(`${API_BASE_URL}/api/transcriptions/upload`, {
+    method: 'POST',
+    body: form,
+  });
+  return parseJsonResponse(response);
+}
+
+async function fetchJob(jobId) {
+  const response = await fetch(`${API_BASE_URL}/api/transcriptions/${jobId}`);
+  return parseJsonResponse(response);
+}
+
+async function fetchStems(jobId) {
+  const response = await fetch(`${API_BASE_URL}/api/transcriptions/${jobId}/stems`);
+  return parseJsonResponse(response);
+}
+
+async function fetchOutputs(jobId) {
+  const response = await fetch(`${API_BASE_URL}/api/transcriptions/${jobId}/outputs`);
+  return parseJsonResponse(response);
+}
+
+async function createDownloadUrl(jobId, key) {
+  const response = await fetch(`${API_BASE_URL}/api/transcriptions/${jobId}/download?key=${encodeURIComponent(key)}`);
+  return parseJsonResponse(response);
+}
+
+function StatusBadge({ status }) {
+  const color = status === 'completed' ? 'success' : status === 'failed' ? 'error' : 'warning';
+  return <Chip label={status || 'idle'} color={color} sx={{ fontWeight: 900, textTransform: 'uppercase' }} />;
+}
+
+function OutputButton({ jobId, name, objectKey, ready }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Smooth progress bar animation and active micro-increments
-  React.useEffect(() => {
-    if (!job) {
-      setDisplayedProgress(0);
-      return;
+  const openDownload = async () => {
+    if (!objectKey || !ready) return;
+    setLoading(true);
+    setError('');
+    try {
+      const payload = await createDownloadUrl(jobId, objectKey);
+      window.open(payload.url, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      setError(err.message || 'Download failed');
+    } finally {
+      setLoading(false);
     }
-    const target = job.progress || 0;
+  };
+
+  return (
+    <Card sx={{ border: '3px solid var(--brutal-ink)', boxShadow: '4px 4px 0 var(--brutal-ink)' }}>
+      <CardContent>
+        <Stack spacing={1}>
+          <Typography variant="h6" sx={{ fontWeight: 950 }}>{name}</Typography>
+          <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>{objectKey || 'Not planned yet'}</Typography>
+          <Chip label={ready ? 'ready' : 'waiting'} color={ready ? 'success' : 'default'} sx={{ alignSelf: 'flex-start', fontWeight: 900 }} />
+          <Button variant="contained" disabled={!ready || loading} onClick={openDownload} sx={{ fontWeight: 900 }}>
+            {loading ? 'Opening...' : 'Download'}
+          </Button>
+          {error ? <Alert severity="error">{error}</Alert> : null}
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function TranscriberPage() {
+  const [url, setUrl] = useState('');
+  const [file, setFile] = useState(null);
+  const [userId, setUserId] = useState('anonymous');
+  const [targetStem, setTargetStem] = useState('vocals');
+  const [selectedStems, setSelectedStems] = useState(DEFAULT_STEMS);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [job, setJob] = useState(null);
+  const [stems, setStems] = useState(null);
+  const [outputs, setOutputs] = useState(null);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const jobId = job?.id;
+  const progress = Math.max(0, Math.min(100, Number(job?.progress || 0)));
+  const isRunning = job && !FINAL_STATUSES.has(job.status);
+
+  const toggleStem = (stem) => {
+    setSelectedStems((current) => {
+      if (current.includes(stem)) {
+        const next = current.filter((item) => item !== stem);
+        return next.length ? next : current;
+      }
+      return [...current, stem];
+    });
+  };
+
+  const refreshJob = useCallback(async () => {
+    if (!jobId) return;
+    const [jobPayload, stemsPayload, outputsPayload] = await Promise.all([
+      fetchJob(jobId),
+      fetchStems(jobId),
+      fetchOutputs(jobId),
+    ]);
+    setJob(jobPayload);
+    setStems(stemsPayload);
+    setOutputs(outputsPayload);
+  }, [jobId]);
+
+  useEffect(() => {
+    if (!jobId || FINAL_STATUSES.has(job?.status)) return undefined;
     const interval = setInterval(() => {
-      setDisplayedProgress((prev) => {
-        if (prev < target) {
-          return prev + 1;
-        } else if (prev > target) {
-          if (prev - target > 15) {
-            return target;
-          }
-          return prev - 1;
-        } else {
-          // Micro-increment slowly if the job is active to show visual progress
-          const isActive = job.status !== 'completed' && job.status !== 'failed';
-          if (isActive && prev < 98) {
-            if (Math.random() < 0.15) {
-              return prev + 1;
-            }
-          }
-          return prev;
-        }
-      });
-    }, 150);
-
+      refreshJob().catch((err) => setError(err.message || 'Unable to refresh transcription job'));
+    }, 2500);
     return () => clearInterval(interval);
-  }, [job?.progress, job?.status]);
+  }, [jobId, job?.status, refreshJob]);
 
-  const plannedOutputs = useMemo(() => {
-    if (!job) return [];
-    const target = job.target_stem || targetStem || 'vocals';
-    return [
-      `${target}.mid`,
-      `${target}.musicxml`,
-      `${target}.pdf`,
-      'notes.json',
-      'job.json',
-    ];
-  }, [job, targetStem]);
-
-  async function refreshJob(jobId) {
-    const response = await fetch(buildApiUrl(`/api/transcriptions/${jobId}`));
-    if (!response.ok) throw new Error('Unable to refresh the transcription job.');
-    const data = await response.json();
-    setJob(data);
-
-    try {
-      const stemsRes = await fetch(buildApiUrl(`/api/transcriptions/${jobId}/stems`));
-      if (stemsRes.ok) {
-        const stemsData = await stemsRes.json();
-        setStems(stemsData.stems || []);
-      }
-    } catch (e) {
-      console.error('Error fetching stems:', e);
-    }
-
-    try {
-      const outputsRes = await fetch(buildApiUrl(`/api/transcriptions/${jobId}/outputs`));
-      if (outputsRes.ok) {
-        const outputsData = await outputsRes.json();
-        setOutputs(outputsData.outputs || null);
-      }
-    } catch (e) {
-      console.error('Error fetching outputs:', e);
-    }
-
-    return data;
-  }
-
-  // Automatic Polling every 2s while job is not finished
-  React.useEffect(() => {
-    if (!job || job.status === 'completed' || job.status === 'failed') return;
-    const timer = setInterval(() => {
-      refreshJob(job.id).catch(console.error);
-    }, 2000);
-    return () => clearInterval(timer);
-  }, [job?.id, job?.status]);
-
-  async function handleDownload(key) {
-    if (!job) return;
-    try {
-      const response = await fetch(buildApiUrl(`/api/transcriptions/${job.id}/download?key=${encodeURIComponent(key)}`));
-      if (!response.ok) throw new Error('Failed to generate download link.');
-      const data = await response.json();
-      if (data.url) {
-        window.open(data.url, '_blank');
-      }
-    } catch (err) {
-      alert(err.message || String(err));
-    }
-  }
-
-  async function createFromUrl() {
-    setError('');
-    setLoading(true);
-    setStems([]);
-    setOutputs(null);
-    try {
-      const response = await fetch(buildApiUrl('/api/transcriptions/from-url'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: youtubeUrl,
-          user_id: 'anonymous',
-          selected_stems: DEFAULT_STEMS,
-          target_stem: targetStem,
-          create_pdf: true,
-          create_musicxml: true,
-        }),
-      });
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.detail || 'Unable to create transcription from URL.');
-      }
-      const data = await response.json();
-      setJob(data);
-      refreshJob(data.id).catch(console.error);
-    } catch (err) {
-      setError(err.message || String(err));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function uploadAudio() {
-    if (!selectedFile) {
-      setError('Select an audio file first.');
+  const submitUrl = async () => {
+    if (!url.trim()) {
+      setError('Paste a YouTube or audio URL first.');
       return;
     }
+    setSubmitting(true);
     setError('');
-    setLoading(true);
-    setStems([]);
+    setStems(null);
     setOutputs(null);
     try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('user_id', 'anonymous');
-      formData.append('selected_stems', DEFAULT_STEMS.join(','));
-      formData.append('target_stem', targetStem);
-
-      const response = await fetch(buildApiUrl('/api/transcriptions/upload'), {
-        method: 'POST',
-        body: formData,
-      });
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.detail || 'Unable to upload audio.');
-      }
-      const data = await response.json();
-      setJob(data);
-      refreshJob(data.id).catch(console.error);
+      const created = await createUrlJob({ url: url.trim(), userId, selectedStems, targetStem });
+      setJob(created);
     } catch (err) {
-      setError(err.message || String(err));
+      setError(err.message || 'Could not create URL transcription job');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
-  }
+  };
+
+  const submitFile = async () => {
+    if (!file) {
+      setError('Choose an audio file first.');
+      return;
+    }
+    setSubmitting(true);
+    setError('');
+    setStems(null);
+    setOutputs(null);
+    try {
+      const created = await createUploadJob({ file, userId, selectedStems, targetStem });
+      setJob(created);
+    } catch (err) {
+      setError(err.message || 'Could not create upload transcription job');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const readyOutputs = useMemo(() => {
+    const objectMap = outputs?.outputs || {};
+    const readyMap = outputs?.ready || {};
+    return Object.entries(objectMap).filter(([name]) => !name.startsWith('stem:')).map(([name, objectKey]) => ({
+      name,
+      objectKey,
+      ready: Boolean(readyMap[name]),
+    }));
+  }, [outputs]);
 
   return (
     <>
       <Head>
-        <title>Music Transcriber | Music Graciously</title>
-        <meta
-          name="description"
-          content="Upload a song or paste a YouTube URL, split sources with Demucs, and prepare notes with Basic Pitch for MIDI, MusicXML, and PDF sheet music."
-        />
+        <title>AI Music Transcriber | Music Graciously</title>
+        <meta name="description" content="Upload audio or paste a YouTube URL, then generate stems, MIDI, MusicXML, PDF, and note metadata." />
       </Head>
 
-      <Box sx={{ bgcolor: 'var(--brutal-yellow)', pt: { xs: 10, md: 12 }, pb: 8, borderBottom: '4px solid var(--brutal-ink)' }}>
-        <Container maxWidth="lg">
-          <Stack spacing={3}>
-            <Chip label="New AI Music Tool" sx={{ alignSelf: 'flex-start', fontWeight: 900, bgcolor: 'var(--brutal-paper)', border: '2px solid var(--brutal-ink)' }} />
-            <Typography variant="h1" component="h1" sx={{ fontSize: { xs: '2.8rem', md: '5rem' }, lineHeight: 0.95, fontWeight: 950, color: 'var(--brutal-ink)' }}>
-              Transcribe songs into playable sheet music.
-            </Typography>
-            <Typography variant="h5" sx={{ maxWidth: 860, fontWeight: 800, color: 'var(--brutal-ink)' }}>
-              Start with an upload or YouTube URL. The backend queues the job in Upstash Redis, stores files in categorized Cloudflare R2 folders, then prepares the Demucs and Basic Pitch pipeline.
-            </Typography>
-          </Stack>
+      <Box sx={{ bgcolor: 'var(--brutal-yellow)', pt: { xs: 10, md: 13 }, pb: 6, borderBottom: '4px solid var(--brutal-ink)' }}>
+        <Container maxWidth="xl">
+          <Typography variant="h1" sx={{ fontSize: { xs: '2.8rem', md: '5rem' }, fontWeight: 950, lineHeight: 0.95, color: 'var(--brutal-ink)' }}>
+            AI Music Transcriber
+          </Typography>
+          <Typography variant="h5" sx={{ mt: 2, maxWidth: 900, fontWeight: 800, color: 'var(--brutal-ink)' }}>
+            Create one backend job, let the Fly worker process it in order, and download real R2 outputs when they are ready.
+          </Typography>
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Stack spacing={4}>
-          {error && <Alert severity="error">{error}</Alert>}
-
-          <Card sx={{ border: '4px solid var(--brutal-ink)', boxShadow: '8px 8px 0 var(--brutal-ink)' }}>
-            <CardContent>
-              <Stack spacing={3}>
-                <Typography variant="h4" sx={{ fontWeight: 950 }}>Create a transcription job</Typography>
-                <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-                  <TextField
-                    label="YouTube or video URL"
-                    value={youtubeUrl}
-                    onChange={(event) => setYoutubeUrl(event.target.value)}
-                    fullWidth
-                  />
-                  <TextField
-                    label="Target stem"
-                    value={targetStem}
-                    onChange={(event) => setTargetStem(event.target.value)}
-                    sx={{ minWidth: { md: 180 } }}
-                  />
-                  <Button variant="contained" size="large" disabled={loading || !youtubeUrl} onClick={createFromUrl} sx={{ fontWeight: 900 }}>
-                    Use URL
-                  </Button>
-                </Stack>
-
-                <Divider>or upload audio</Divider>
-
-                <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }}>
-                  <Button variant="outlined" component="label" sx={{ fontWeight: 900, bgcolor: 'var(--brutal-paper)' }}>
-                    Choose audio file
-                    <input hidden type="file" accept="audio/*,video/*" onChange={(event) => setSelectedFile(event.target.files?.[0] || null)} />
-                  </Button>
-                  <Typography sx={{ flex: 1, fontWeight: 700 }}>
-                    {selectedFile ? selectedFile.name : 'MP3, WAV, M4A, MP4, or another audio/video source'}
-                  </Typography>
-                  <Button variant="contained" size="large" disabled={loading || !selectedFile} onClick={uploadAudio} sx={{ fontWeight: 900 }}>
-                    Upload
-                  </Button>
-                </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
-
-          {job && (
-            <Card sx={{ border: '4px solid var(--brutal-ink)', boxShadow: '8px 8px 0 var(--brutal-ink)' }}>
+      <Container maxWidth="xl" sx={{ py: 5 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={5}>
+            <Card sx={{ border: '4px solid var(--brutal-ink)', boxShadow: '6px 6px 0 var(--brutal-ink)' }}>
               <CardContent>
                 <Stack spacing={3}>
-                  <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2}>
-                    <Box>
-                      <Typography variant="h4" sx={{ fontWeight: 950 }}>Job {job.id}</Typography>
-                      <Typography sx={{ fontWeight: 700 }}>Status: {job.status}</Typography>
-                      <Typography sx={{ color: 'text.secondary' }}>{job.message}</Typography>
-                    </Box>
-                    <Button variant="outlined" onClick={() => refreshJob(job.id)} sx={{ alignSelf: { md: 'start' }, fontWeight: 900, bgcolor: 'var(--brutal-paper)' }}>
-                      Refresh
+                  <Typography variant="h4" sx={{ fontWeight: 950 }}>Create a job</Typography>
+                  <TextField label="User ID" value={userId} onChange={(event) => setUserId(event.target.value)} fullWidth />
+                  <TextField label="Target stem" value={targetStem} onChange={(event) => setTargetStem(event.target.value)} fullWidth helperText="Example: vocals, drums, bass, other" />
+
+                  <Box>
+                    <Button variant="outlined" onClick={() => setIsModalOpen(true)} sx={{ fontWeight: 900, width: '100%', border: '3px solid var(--brutal-ink)', boxShadow: '3px 3px 0 var(--brutal-ink)' }}>
+                      Configure Song Instruments ({selectedStems.length} selected)
                     </Button>
-                  </Stack>
-
-                  <Box>
-                    <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                      <Typography sx={{ fontWeight: 900 }}>Progress</Typography>
-                      <Typography sx={{ fontWeight: 900 }}>{displayedProgress}%</Typography>
-                    </Stack>
-                    <LinearProgress variant="determinate" value={Math.min(100, Math.max(0, displayedProgress))} sx={{ height: 14, borderRadius: 2 }} />
                   </Box>
 
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 950, mb: 1 }}>Cloudflare R2 base folder</Typography>
-                    <Typography component="code" sx={{ display: 'block', p: 2, bgcolor: 'var(--brutal-paper)', border: '2px solid var(--brutal-ink)', overflowX: 'auto' }}>
-                      {job.r2_base_prefix}
-                    </Typography>
-                  </Box>
+                  <Divider />
 
-                  {stems.length > 0 && (
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 950, mb: 1 }}>Stems (Partitions) Status</Typography>
-                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                        {stems.map((stem) => {
-                          let chipColor = 'default';
-                          if (stem.status === 'running') chipColor = 'warning';
-                          if (stem.status === 'ready') chipColor = 'success';
-                          if (stem.status === 'failed') chipColor = 'error';
-                          return (
-                            <Chip
-                              key={stem.name}
-                              label={`${stem.name}: ${stem.status}`}
-                              color={chipColor}
-                              variant="outlined"
-                              sx={{ fontWeight: 700 }}
-                            />
-                          );
-                        })}
-                      </Stack>
-                    </Box>
-                  )}
+                  <TextField label="YouTube or audio URL" value={url} onChange={(event) => setUrl(event.target.value)} fullWidth />
+                  <Button variant="contained" onClick={submitUrl} disabled={submitting || !url.trim()} sx={{ fontWeight: 900 }}>
+                    Start from URL
+                  </Button>
 
-                  {job.status === 'completed' && outputs && (
-                    <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 950, mb: 1 }}>Generated Outputs (Download)</Typography>
-                      <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
-                        {Object.entries(outputs).map(([type, key]) => (
-                          <Button
-                            key={type}
-                            variant="contained"
-                            size="small"
-                            onClick={() => handleDownload(key)}
-                            sx={{
-                              fontWeight: 900,
-                              textTransform: 'uppercase',
-                              border: '2px solid var(--brutal-ink)',
-                              boxShadow: '2px 2px 0 var(--brutal-ink)',
-                              bgcolor: 'var(--brutal-yellow)',
-                              color: 'var(--brutal-ink)',
-                              '&:hover': {
-                                boxShadow: 'none',
-                                transform: 'translate(2px, 2px)',
-                                bgcolor: 'var(--brutal-yellow)',
-                              }
-                            }}
-                          >
-                            Download {type}
-                          </Button>
-                        ))}
-                      </Stack>
-                    </Box>
-                  )}
+                  <Divider />
 
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 950, mb: 1 }}>Planned partition outputs</Typography>
-                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                      {plannedOutputs.map((output) => <Chip key={output} label={output} />)}
-                    </Stack>
-                  </Box>
+                  <Button component="label" variant="outlined" sx={{ fontWeight: 900, bgcolor: 'var(--brutal-paper)' }}>
+                    Choose audio file
+                    <input hidden type="file" accept="audio/*,video/*" onChange={(event) => setFile(event.target.files?.[0] || null)} />
+                  </Button>
+                  {file ? <Typography sx={{ fontWeight: 800 }}>{file.name}</Typography> : null}
+                  <Button variant="contained" onClick={submitFile} disabled={submitting || !file} sx={{ fontWeight: 900 }}>
+                    Upload and start
+                  </Button>
+
+                  {submitting ? <LinearProgress /> : null}
+                  {error ? <Alert severity="error">{error}</Alert> : null}
                 </Stack>
               </CardContent>
             </Card>
-          )}
-        </Stack>
+          </Grid>
+
+          <Grid item xs={12} md={7}>
+            <Stack spacing={3}>
+              <Card sx={{ border: '4px solid var(--brutal-ink)', boxShadow: '6px 6px 0 var(--brutal-ink)' }}>
+                <CardContent>
+                  <Stack spacing={2}>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" gap={2}>
+                      <Box>
+                        <Typography variant="h4" sx={{ fontWeight: 950 }}>Job status</Typography>
+                        <Typography sx={{ wordBreak: 'break-all' }}>{jobId || 'No job yet'}</Typography>
+                      </Box>
+                      <StatusBadge status={job?.status || 'idle'} />
+                    </Stack>
+                    <LinearProgress variant="determinate" value={progress} sx={{ height: 12, borderRadius: 1 }} />
+                    <Typography sx={{ fontWeight: 900 }}>{progress}%</Typography>
+                    <Typography>{job?.message || 'Create a transcription job to start the worker pipeline.'}</Typography>
+                    {isRunning ? (
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <CircularProgress size={20} />
+                        <Typography sx={{ fontWeight: 800 }}>Polling backend every 2.5 seconds...</Typography>
+                      </Stack>
+                    ) : null}
+                    {jobId ? <Button variant="outlined" onClick={refreshJob} sx={{ alignSelf: 'flex-start', fontWeight: 900 }}>Refresh now</Button> : null}
+                  </Stack>
+                </CardContent>
+              </Card>
+
+              <Card sx={{ border: '4px solid var(--brutal-ink)', boxShadow: '6px 6px 0 var(--brutal-ink)' }}>
+                <CardContent>
+                  <Typography variant="h4" sx={{ fontWeight: 950, mb: 2 }}>Stems</Typography>
+                  <Grid container spacing={2}>
+                    {(stems?.stems || []).map((stem) => (
+                      <Grid item xs={12} sm={6} key={stem.name}>
+                        <Card sx={{ border: '3px solid var(--brutal-ink)' }}>
+                          <CardContent>
+                            <Stack spacing={1}>
+                              <Typography variant="h6" sx={{ fontWeight: 950 }}>{stem.name}</Typography>
+                              <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>{stem.r2Key}</Typography>
+                              <Chip label={stem.exists ? 'ready' : stem.status} color={stem.exists ? 'success' : 'default'} sx={{ alignSelf: 'flex-start', fontWeight: 900 }} />
+                            </Stack>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                    {!stems?.stems?.length ? <Grid item xs={12}><Typography>No stems yet.</Typography></Grid> : null}
+                  </Grid>
+                </CardContent>
+              </Card>
+
+              <Card sx={{ border: '4px solid var(--brutal-ink)', boxShadow: '6px 6px 0 var(--brutal-ink)' }}>
+                <CardContent>
+                  <Typography variant="h4" sx={{ fontWeight: 950, mb: 2 }}>Outputs</Typography>
+                  <Grid container spacing={2}>
+                    {readyOutputs.map((output) => (
+                      <Grid item xs={12} sm={6} key={output.name}>
+                        <OutputButton jobId={jobId} {...output} />
+                      </Grid>
+                    ))}
+                    {!readyOutputs.length ? <Grid item xs={12}><Typography>No outputs yet.</Typography></Grid> : null}
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Stack>
+          </Grid>
+        </Grid>
       </Container>
+
+      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { border: '4px solid var(--brutal-ink)', boxShadow: '6px 6px 0 var(--brutal-ink)' } }}>
+        <DialogTitle sx={{ fontWeight: 950, borderBottom: '3px solid var(--brutal-ink)', bgcolor: 'var(--brutal-yellow)', color: 'var(--brutal-ink)' }}>
+          Song Instruments Setup
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          <Typography variant="body1" sx={{ mt: 1, fontWeight: 800, mb: 3, color: 'var(--brutal-ink)' }}>
+            Which instruments are present in this song? We will configure the transcription pipeline to only separate and transcribe the selected parts.
+          </Typography>
+          <FormGroup>
+            {[
+              { id: 'vocals', name: 'Vocals / Voice', desc: 'Lead, backing vocals, or choirs' },
+              { id: 'drums', name: 'Drums / Percussion', desc: 'Acoustic drum kits, electronic percussion, drum machines' },
+              { id: 'bass', name: 'Bass / Bass Guitar', desc: 'Electric bass, double bass, synth bass' },
+              { id: 'guitar', name: 'Guitar', desc: 'Acoustic, clean electric, or distorted lead guitar' },
+              { id: 'piano', name: 'Piano / Keyboards', desc: 'Acoustic piano, electric piano, synths, or keyboard leads' },
+              { id: 'other', name: 'Other Instruments', desc: 'Brass, strings, woodwinds, lead synths, sound effects' },
+            ].map((inst) => (
+              <Box key={inst.id} sx={{ mb: 2, p: 1.5, border: '2.5px solid var(--brutal-ink)', borderRadius: 1, bgcolor: selectedStems.includes(inst.id) ? 'rgba(255, 235, 59, 0.1)' : 'transparent' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedStems.includes(inst.id)}
+                      onChange={() => toggleStem(inst.id)}
+                      sx={{ color: 'var(--brutal-ink)', '&.Mui-checked': { color: 'var(--brutal-ink)' }, '& .MuiSvgIcon-root': { fontSize: 28 } }}
+                    />
+                  }
+                  label={
+                    <Box sx={{ ml: 1 }}>
+                      <Typography sx={{ fontWeight: 950, fontSize: '1.1rem', color: 'var(--brutal-ink)' }}>{inst.name}</Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700 }}>{inst.desc}</Typography>
+                    </Box>
+                  }
+                />
+              </Box>
+            ))}
+          </FormGroup>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '3px solid var(--brutal-ink)', bgcolor: 'var(--brutal-paper)' }}>
+          <Button variant="contained" onClick={() => setIsModalOpen(false)} sx={{ fontWeight: 900, border: '2.5px solid var(--brutal-ink)', boxShadow: '3px 3px 0 var(--brutal-ink)' }}>
+            Save Selection
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
