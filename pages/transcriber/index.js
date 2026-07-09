@@ -29,6 +29,8 @@ export default function TranscriberPage() {
   const [targetStem, setTargetStem] = useState('vocals');
   const [selectedFile, setSelectedFile] = useState(null);
   const [job, setJob] = useState(null);
+  const [stems, setStems] = useState([]);
+  const [outputs, setOutputs] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -49,12 +51,58 @@ export default function TranscriberPage() {
     if (!response.ok) throw new Error('Unable to refresh the transcription job.');
     const data = await response.json();
     setJob(data);
+
+    try {
+      const stemsRes = await fetch(buildApiUrl(`/api/transcriptions/${jobId}/stems`));
+      if (stemsRes.ok) {
+        const stemsData = await stemsRes.json();
+        setStems(stemsData.stems || []);
+      }
+    } catch (e) {
+      console.error('Error fetching stems:', e);
+    }
+
+    try {
+      const outputsRes = await fetch(buildApiUrl(`/api/transcriptions/${jobId}/outputs`));
+      if (outputsRes.ok) {
+        const outputsData = await outputsRes.json();
+        setOutputs(outputsData.outputs || null);
+      }
+    } catch (e) {
+      console.error('Error fetching outputs:', e);
+    }
+
     return data;
+  }
+
+  // Automatic Polling every 2s while job is not finished
+  React.useEffect(() => {
+    if (!job || job.status === 'completed' || job.status === 'failed') return;
+    const timer = setInterval(() => {
+      refreshJob(job.id).catch(console.error);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [job?.id, job?.status]);
+
+  async function handleDownload(key) {
+    if (!job) return;
+    try {
+      const response = await fetch(buildApiUrl(`/api/transcriptions/${job.id}/download?key=${encodeURIComponent(key)}`));
+      if (!response.ok) throw new Error('Failed to generate download link.');
+      const data = await response.json();
+      if (data.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (err) {
+      alert(err.message || String(err));
+    }
   }
 
   async function createFromUrl() {
     setError('');
     setLoading(true);
+    setStems([]);
+    setOutputs(null);
     try {
       const response = await fetch(buildApiUrl('/api/transcriptions/from-url'), {
         method: 'POST',
@@ -72,7 +120,9 @@ export default function TranscriberPage() {
         const payload = await response.json().catch(() => ({}));
         throw new Error(payload.detail || 'Unable to create transcription from URL.');
       }
-      setJob(await response.json());
+      const data = await response.json();
+      setJob(data);
+      refreshJob(data.id).catch(console.error);
     } catch (err) {
       setError(err.message || String(err));
     } finally {
@@ -87,6 +137,8 @@ export default function TranscriberPage() {
     }
     setError('');
     setLoading(true);
+    setStems([]);
+    setOutputs(null);
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -102,7 +154,9 @@ export default function TranscriberPage() {
         const payload = await response.json().catch(() => ({}));
         throw new Error(payload.detail || 'Unable to upload audio.');
       }
-      setJob(await response.json());
+      const data = await response.json();
+      setJob(data);
+      refreshJob(data.id).catch(console.error);
     } catch (err) {
       setError(err.message || String(err));
     } finally {
@@ -207,6 +261,60 @@ export default function TranscriberPage() {
                       {job.r2_base_prefix}
                     </Typography>
                   </Box>
+
+                  {stems.length > 0 && (
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 950, mb: 1 }}>Stems (Partitions) Status</Typography>
+                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        {stems.map((stem) => {
+                          let chipColor = 'default';
+                          if (stem.status === 'running') chipColor = 'warning';
+                          if (stem.status === 'ready') chipColor = 'success';
+                          if (stem.status === 'failed') chipColor = 'error';
+                          return (
+                            <Chip
+                              key={stem.name}
+                              label={`${stem.name}: ${stem.status}`}
+                              color={chipColor}
+                              variant="outlined"
+                              sx={{ fontWeight: 700 }}
+                            />
+                          );
+                        })}
+                      </Stack>
+                    </Box>
+                  )}
+
+                  {job.status === 'completed' && outputs && (
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 950, mb: 1 }}>Generated Outputs (Download)</Typography>
+                      <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
+                        {Object.entries(outputs).map(([type, key]) => (
+                          <Button
+                            key={type}
+                            variant="contained"
+                            size="small"
+                            onClick={() => handleDownload(key)}
+                            sx={{
+                              fontWeight: 900,
+                              textTransform: 'uppercase',
+                              border: '2px solid var(--brutal-ink)',
+                              boxShadow: '2px 2px 0 var(--brutal-ink)',
+                              bgcolor: 'var(--brutal-yellow)',
+                              color: 'var(--brutal-ink)',
+                              '&:hover': {
+                                boxShadow: 'none',
+                                transform: 'translate(2px, 2px)',
+                                bgcolor: 'var(--brutal-yellow)',
+                              }
+                            }}
+                          >
+                            Download {type}
+                          </Button>
+                        ))}
+                      </Stack>
+                    </Box>
+                  )}
 
                   <Box>
                     <Typography variant="h6" sx={{ fontWeight: 950, mb: 1 }}>Planned partition outputs</Typography>
