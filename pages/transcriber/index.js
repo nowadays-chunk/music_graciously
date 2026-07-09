@@ -29,10 +29,43 @@ export default function TranscriberPage() {
   const [targetStem, setTargetStem] = useState('vocals');
   const [selectedFile, setSelectedFile] = useState(null);
   const [job, setJob] = useState(null);
+  const [displayedProgress, setDisplayedProgress] = useState(0);
   const [stems, setStems] = useState([]);
   const [outputs, setOutputs] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Smooth progress bar animation and active micro-increments
+  React.useEffect(() => {
+    if (!job) {
+      setDisplayedProgress(0);
+      return;
+    }
+    const target = job.progress || 0;
+    const interval = setInterval(() => {
+      setDisplayedProgress((prev) => {
+        if (prev < target) {
+          return prev + 1;
+        } else if (prev > target) {
+          if (prev - target > 15) {
+            return target;
+          }
+          return prev - 1;
+        } else {
+          // Micro-increment slowly if the job is active to show visual progress
+          const isActive = job.status !== 'completed' && job.status !== 'failed';
+          if (isActive && prev < 98) {
+            if (Math.random() < 0.15) {
+              return prev + 1;
+            }
+          }
+          return prev;
+        }
+      });
+    }, 150);
+
+    return () => clearInterval(interval);
+  }, [job?.progress, job?.status]);
 
   const plannedOutputs = useMemo(() => {
     if (!job) return [];
@@ -250,9 +283,9 @@ export default function TranscriberPage() {
                   <Box>
                     <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
                       <Typography sx={{ fontWeight: 900 }}>Progress</Typography>
-                      <Typography sx={{ fontWeight: 900 }}>{job.progress}%</Typography>
+                      <Typography sx={{ fontWeight: 900 }}>{displayedProgress}%</Typography>
                     </Stack>
-                    <LinearProgress variant="determinate" value={Math.min(100, Math.max(0, job.progress || 0))} sx={{ height: 14, borderRadius: 2 }} />
+                    <LinearProgress variant="determinate" value={Math.min(100, Math.max(0, displayedProgress))} sx={{ height: 14, borderRadius: 2 }} />
                   </Box>
 
                   <Box>
