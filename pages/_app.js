@@ -170,6 +170,7 @@ const featuredDrawerSx = (bgcolor) => ({
 const drawerItems = [
   { type: 'link', label: '🎸 Play', href: '/play', sx: featuredDrawerSx('var(--brutal-yellow)') },
   { type: 'link', label: '🎼 Generate', href: '/generate', sx: featuredDrawerSx('var(--brutal-blue)') },
+  { type: 'link', label: '🧬 Transcriber', href: '/transcriber', sx: featuredDrawerSx('var(--brutal-mint)') },
   { type: 'link', label: '🏗️ Architecture', href: '/music-architecture', sx: featuredDrawerSx('var(--brutal-orange)') },
   { type: 'link', label: '👂 Ear Training', href: '/ear-training', sx: featuredDrawerSx('var(--brutal-mint)') },
   { type: 'link', label: '🎯 Matches', href: '/matches', sx: featuredDrawerSx('var(--brutal-pink)') },
@@ -314,11 +315,12 @@ function App({ Component, pageProps }) {
                     overflowY: 'auto',
                     bgcolor: 'var(--brutal-bg)',
                     borderRight: { xs: '4px solid var(--brutal-ink)', md: 0 },
-                    borderBottom: { xs: '4px solid var(--brutal-ink)', md: '4px solid var(--brutal-ink)' },
-                    boxShadow: { xs: '10px 0 0 rgba(0,0,0,0.22)', md: '0 10px 0 rgba(0,0,0,0.22)' },
+                    borderBottom: { xs: 0, md: '4px solid var(--brutal-ink)' },
+                    boxShadow: '6px 6px 0 var(--brutal-ink)',
                   },
                 }}
                 variant="temporary"
+                anchor={globalTheme.direction === 'rtl' ? 'right' : 'left'}
                 open={drawerOpen}
                 onClose={handleDrawerClose}
                 ModalProps={{ keepMounted: true }}
@@ -329,53 +331,26 @@ function App({ Component, pageProps }) {
 
             <Main open={drawerOpen}>
               <Container>
-                <Component {...pageProps} leftDrawerOpen={drawerOpen} leftDrawerWidth={drawerWidth} />
+                {pageLoading && (
+                  <Box
+                    sx={{
+                      position: 'fixed',
+                      top: { xs: 56, sm: 64 },
+                      left: 0,
+                      right: 0,
+                      zIndex: 9999,
+                      height: 4,
+                      background: 'linear-gradient(90deg, var(--brutal-yellow), var(--brutal-pink), var(--brutal-blue))',
+                      animation: 'spin 1.2s linear infinite',
+                    }}
+                  />
+                )}
+                <Component {...pageProps} />
               </Container>
               <Footer />
             </Main>
-
             <CartDrawer />
           </Box>
-
-          {pageLoading && (
-            <Box
-              sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100vw',
-                height: '100vh',
-                bgcolor: 'rgba(255, 253, 245, 0.85)',
-                backdropFilter: 'blur(8px)',
-                zIndex: 999999,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              <Box
-                sx={{
-                  width: 100,
-                  height: 100,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  bgcolor: 'var(--brutal-paper)',
-                  border: '4px solid var(--brutal-ink)',
-                  boxShadow: 'var(--brutal-shadow)',
-                  borderRadius: '50%',
-                }}
-              >
-                <svg width="56" height="56" viewBox="0 0 50 50" style={{ animation: 'spin 1s linear infinite' }}>
-                  <circle cx="25" cy="25" r="20" fill="none" stroke="var(--brutal-bg)" strokeWidth="6" />
-                  <path d="M25,5a20,20 0 0,1 20,20" fill="none" stroke="var(--brutal-pink)" strokeWidth="6" strokeLinecap="round" />
-                </svg>
-              </Box>
-              <Box sx={{ fontWeight: 900, color: 'var(--brutal-ink)', textTransform: 'uppercase', letterSpacing: 1 }}>Loading...</Box>
-            </Box>
-          )}
         </ThemeProvider>
       </Provider>
     </>
