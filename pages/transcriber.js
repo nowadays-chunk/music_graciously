@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://backend-humming-hill-1299.fly.dev').replace(/\/$/, '');
+const API_BASE_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://thisismytranscriber.fly.dev').replace(/\/$/, '');
 const DEFAULT_STEMS = ['vocals', 'drums', 'bass', 'other'];
 const FINAL_STATUSES = new Set(['completed', 'failed']);
 
