@@ -147,10 +147,10 @@ const SONG_EXAMPLES = {
   ],
 };
 
-const DEFAULT_SONGS = [
-  song('C Jam Blues', 'Duke Ellington', 'C', 'https://www.youtube.com/watch?v=gOlpcJhNyDI'),
-  song('Stand by Me', 'Ben E. King', 'A', 'https://www.youtube.com/watch?v=hwZNL7QVJjE'),
-  song('House of the Rising Sun', 'The Animals', 'A', 'https://www.youtube.com/watch?v=N4bFqW_eu2I'),
+const uniquePracticeSongs = (name, index) => [
+  song(`${name} study ${index + 1}A`, 'Music Graciously practice', null, null),
+  song(`${name} study ${index + 1}B`, 'Music Graciously practice', null, null),
+  song(`${name} study ${index + 1}C`, 'Music Graciously practice', null, null),
 ];
 
 const DEGREE_TO_SEMITONES = { I:0, II:2, III:4, IV:5, V:7, VI:9, VII:11 };
@@ -188,7 +188,7 @@ export function parseRomanToken(token) {
 }
 
 export const CHORD_PROGRESSIONS = BASE_PROGRESSIONS.map(([name, numerals], index) => {
-  const songMetadata = SONG_EXAMPLES[name] || DEFAULT_SONGS;
+  const songMetadata = SONG_EXAMPLES[name] || uniquePracticeSongs(name, index);
   return {
     id: `progression-${index + 1}`,
     name,
