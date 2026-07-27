@@ -101,6 +101,18 @@ const BASE_PROGRESSIONS = [
   ['i–iiø7–V7b9–i', ['i','iiø7','V7b9','i']]
 ];
 
+const SONG_EXAMPLES = {
+  'I–V–vi–IV': ['Let It Be — The Beatles', 'No Woman, No Cry — Bob Marley', "Don't Stop Believin' — Journey"],
+  'vi–IV–I–V': ['Someone Like You — Adele', 'I Want It That Way — Backstreet Boys', 'Demons — Imagine Dragons'],
+  'ii–V–I': ['Autumn Leaves — Joseph Kosma', 'Blue Bossa — Kenny Dorham', 'Satin Doll — Duke Ellington'],
+  'ii7–V7–Imaj7': ['Fly Me to the Moon — Bart Howard', 'There Will Never Be Another You — Harry Warren', 'All the Things You Are — Jerome Kern'],
+  'I7–IV7–I7–V7': ['Pride and Joy — Stevie Ray Vaughan', 'Sweet Home Chicago — Robert Johnson', 'Hound Dog — Big Mama Thornton'],
+  'i7–iv7–i7–V7': ['The Thrill Is Gone — B.B. King', 'St. James Infirmary — traditional', 'Summertime — George Gershwin'],
+  'i–bVII–bVI–V': ['Hit the Road Jack — Percy Mayfield', 'Misirlou — traditional', 'Sultans of Swing — Dire Straits'],
+  'i–VI–III–VII': ['Despacito — Luis Fonsi', 'Numb — Linkin Park', 'In the End — Linkin Park'],
+};
+
+const DEFAULT_SONGS = ['Representative standard', 'Common popular song', 'Traditional or regional example'];
 const DEGREE_TO_SEMITONES = { I:0, II:2, III:4, IV:5, V:7, VI:9, VII:11 };
 const QUALITY_SUFFIX = {
   '': 'M', m: 'min', maj7: 'M7', '7': '7', m7: 'min7', '6': '6',
@@ -136,6 +148,7 @@ export const CHORD_PROGRESSIONS = BASE_PROGRESSIONS.map(([name, numerals], index
   id: `progression-${index + 1}`,
   name,
   numerals,
+  songs: SONG_EXAMPLES[name] || DEFAULT_SONGS,
   chords: numerals.map(parseRomanToken),
 }));
 
@@ -144,14 +157,5 @@ export function progressionInKey(progression, keyIndex, getNoteName, preferFlats
     ...chord,
     rootIndex: (keyIndex + chord.semitones) % 12,
     label: `${getNoteName((keyIndex + chord.semitones) % 12, preferFlats)}${chord.quality === 'M' ? '' : chord.quality}`,
-  }));
-}
-
-export function progressionOnTonic(progression, keyIndex, getNoteName, preferFlats) {
-  const tonic = getNoteName(keyIndex, preferFlats);
-  return progression.chords.map((chord) => ({
-    ...chord,
-    rootIndex: keyIndex,
-    label: `${tonic}${chord.quality === 'M' ? '' : chord.quality}`,
   }));
 }
