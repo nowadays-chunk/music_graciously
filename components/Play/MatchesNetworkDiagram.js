@@ -263,16 +263,53 @@ const MatchesNetworkDiagram = () => {
 
   const progressionWorkflow = useMemo(() => {
     if (!selectedProgression) return null;
+
     const nodes = [];
     const edges = [];
     const scaleUsage = {};
     const modeUsage = {};
     const noteUsage = {};
+    const branchGap = 90;
+    const scaleGap = 180;
+    const chordGap = 160;
+    const chordY = 300;
+    const scaleY = 40;
+    const modeY = -230;
 
-    progressionSteps.forEach((step, stepIndex) => {
+    const branches = progressionSteps.map((step) => {
+      const compatibleScales = SCALE_KEYS.map((scaleKey) => {
+        const scale = guitar.scales[scaleKey];
+        if (!scale) return null;
+        const scaleNotes = getAbsoluteNotes('scale', scaleKey, step.rootIndex);
+        if (!step.notes.every((note) => scaleNotes.includes(note))) return null;
+
+        const playableModes = [];
+        if (scale.modes && scale.modes.length) {
+          scale.modes.forEach((mode, modeIndex) => {
+            const modeNotes = getAbsoluteNotes('scale', scaleKey, step.rootIndex, modeIndex);
+            if (step.notes.every((note) => modeNotes.includes(note))) {
+              playableModes.push({ mode, modeIndex, notes: modeNotes });
+            }
+          });
+        }
+
+        return { scaleKey, scale, notes: scaleNotes, playableModes };
+      }).filter(Boolean);
+
+      const scaleWidths = compatibleScales.map((entry) => Math.max(scaleGap, entry.playableModes.length * 145));
+      const branchWidth = Math.max(420, scaleWidths.reduce((total, width) => total + width, 0) + Math.max(0, compatibleScales.length - 1) * branchGap);
+      return { step, compatibleScales, scaleWidths, branchWidth };
+    });
+
+    const totalWidth = branches.reduce((total, branch) => total + branch.branchWidth, 0) + Math.max(0, branches.length - 1) * chordGap;
+    let branchCursor = -totalWidth / 2;
+
+    branches.forEach((branch, stepIndex) => {
+      const { step, compatibleScales, scaleWidths, branchWidth } = branch;
       step.notes.forEach((note) => { noteUsage[note] = (noteUsage[note] || 0) + 1; });
+
+      const branchCenter = branchCursor + branchWidth / 2;
       const chordId = `progression_chord_${stepIndex}`;
-      const chordX = stepIndex * 430;
       nodes.push({
         id: chordId,
         label: `${stepIndex + 1}. ${step.roman}\n${step.label}`,
@@ -281,34 +318,27 @@ const MatchesNetworkDiagram = () => {
         notes: step.notes,
         intervals: step.chordData.intervals || [],
         description: `Step ${stepIndex + 1} of ${selectedProgression.name}.`,
-        x: chordX,
-        y: 240,
+        x: branchCenter,
+        y: chordY,
         fixed: { x: true, y: true },
         shape: 'box',
-        margin: 18,
-        widthConstraint: { minimum: 150, maximum: 190 },
-        heightConstraint: { minimum: 72 },
+        margin: 20,
+        widthConstraint: { minimum: 170, maximum: 220 },
+        heightConstraint: { minimum: 82 },
         borderWidth: 4,
         color: { background: '#fef08a', border: '#1a1a1a', highlight: { background: '#ff007f', border: '#1a1a1a' } },
-        font: { size: 17, face: 'Open Sans, sans-serif', color: '#1a1a1a', bold: true, multi: true },
+        font: { size: 18, face: 'Open Sans, sans-serif', color: '#1a1a1a', bold: true, multi: true },
         shadow: { enabled: true, color: '#1a1a1a', size: 0, x: 5, y: 5 },
       });
 
-      const compatibleScales = [];
-      SCALE_KEYS.forEach((scaleKey) => {
-        const scale = guitar.scales[scaleKey];
-        if (!scale) return;
-        const scaleNotes = getAbsoluteNotes('scale', scaleKey, step.rootIndex);
-        if (step.notes.every((note) => scaleNotes.includes(note))) {
-          compatibleScales.push({ scaleKey, scale, notes: scaleNotes });
-        }
-      });
-
-      compatibleScales.slice(0, 4).forEach((entry, scaleIndex) => {
+      let scaleCursor = branchCursor;
+      compatibleScales.forEach((entry, scaleIndex) => {
+        const scaleWidth = scaleWidths[scaleIndex];
+        const scaleCenter = scaleCursor + scaleWidth / 2;
         const scaleId = `progression_scale_${stepIndex}_${entry.scaleKey}`;
-        const scaleX = chordX + (scaleIndex - (Math.min(compatibleScales.length, 4) - 1) / 2) * 145;
         const scaleLabel = `${getNoteName(step.rootIndex, preferFlats)} ${entry.scale.name || entry.scaleKey}`;
         scaleUsage[scaleLabel] = (scaleUsage[scaleLabel] || 0) + 1;
+
         nodes.push({
           id: scaleId,
           label: scaleLabel,
@@ -317,41 +347,37 @@ const MatchesNetworkDiagram = () => {
           notes: entry.notes,
           intervals: entry.scale.intervals || [],
           description: `Parent scale compatible with ${step.label}.`,
-          x: scaleX,
-          y: 40,
+          x: scaleCenter,
+          y: scaleY,
           fixed: { x: true, y: true },
           shape: 'box',
-          margin: 12,
-          widthConstraint: { minimum: 130, maximum: 165 },
+          margin: 14,
+          widthConstraint: { minimum: 145, maximum: 190 },
+          heightConstraint: { minimum: 58 },
           borderWidth: 3,
           color: { background: '#99f6e4', border: '#1a1a1a', highlight: { background: '#2dd4bf', border: '#1a1a1a' } },
           font: { size: 14, face: 'Open Sans, sans-serif', color: '#1a1a1a', bold: true },
           shadow: { enabled: true, color: '#1a1a1a', size: 0, x: 4, y: 4 },
         });
+
         edges.push({
           id: `edge_${chordId}_${scaleId}`,
           from: chordId,
           to: scaleId,
-          arrows: { to: { enabled: true, scaleFactor: 0.7 } },
-          width: 2.5,
+          arrows: { to: { enabled: true, scaleFactor: 0.72 } },
+          width: 2.6,
           color: { color: '#1a1a1a', highlight: '#ff007f' },
-          smooth: { enabled: true, type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.18 },
+          smooth: { enabled: true, type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.14 },
         });
 
-        const playableModes = [];
-        if (entry.scale.modes && entry.scale.modes.length) {
-          entry.scale.modes.forEach((mode, modeIndex) => {
-            const modeNotes = getAbsoluteNotes('scale', entry.scaleKey, step.rootIndex, modeIndex);
-            if (step.notes.every((note) => modeNotes.includes(note))) {
-              playableModes.push({ mode, modeIndex, notes: modeNotes });
-            }
-          });
-        }
-
-        playableModes.slice(0, 3).forEach((modeEntry, modeIndex) => {
+        const modeCount = entry.playableModes.length;
+        const modeSpan = Math.max(0, (modeCount - 1) * 145);
+        entry.playableModes.forEach((modeEntry, modeIndex) => {
           const modeId = `progression_mode_${stepIndex}_${entry.scaleKey}_${modeEntry.modeIndex}`;
           const modeLabel = `${getNoteName(step.rootIndex, preferFlats)} ${modeEntry.mode.name}`;
           modeUsage[modeLabel] = (modeUsage[modeLabel] || 0) + 1;
+          const modeX = scaleCenter - modeSpan / 2 + modeIndex * 145;
+
           nodes.push({
             id: modeId,
             label: modeLabel,
@@ -360,17 +386,19 @@ const MatchesNetworkDiagram = () => {
             notes: modeEntry.notes,
             intervals: modeEntry.mode.intervals || entry.scale.intervals || [],
             description: `Playable mode above ${scaleLabel} for ${step.label}.`,
-            x: scaleX + (modeIndex - (Math.min(playableModes.length, 3) - 1) / 2) * 105,
-            y: -145,
+            x: modeX,
+            y: modeY,
             fixed: { x: true, y: true },
             shape: 'box',
-            margin: 10,
-            widthConstraint: { minimum: 110, maximum: 145 },
+            margin: 11,
+            widthConstraint: { minimum: 120, maximum: 160 },
+            heightConstraint: { minimum: 48 },
             borderWidth: 3,
             color: { background: '#e9d5ff', border: '#1a1a1a', highlight: { background: '#c084fc', border: '#1a1a1a' } },
             font: { size: 12, face: 'Open Sans, sans-serif', color: '#1a1a1a', bold: true },
             shadow: { enabled: true, color: '#1a1a1a', size: 0, x: 3, y: 3 },
           });
+
           edges.push({
             id: `edge_${scaleId}_${modeId}`,
             from: scaleId,
@@ -378,25 +406,30 @@ const MatchesNetworkDiagram = () => {
             arrows: { to: { enabled: true, scaleFactor: 0.65 } },
             width: 2,
             color: { color: '#6b21a8', highlight: '#ff007f' },
-            smooth: { enabled: true, type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.15 },
+            smooth: { enabled: true, type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.12 },
           });
         });
+
+        scaleCursor += scaleWidth + branchGap;
       });
 
-      if (stepIndex < progressionSteps.length - 1) {
+      if (stepIndex < branches.length - 1) {
+        const nextBranchCenter = branchCursor + branchWidth + chordGap + branches[stepIndex + 1].branchWidth / 2;
         edges.push({
           id: `edge_progression_${stepIndex}_${stepIndex + 1}`,
           from: chordId,
           to: `progression_chord_${stepIndex + 1}`,
-          arrows: { to: { enabled: true, scaleFactor: 0.85 } },
+          arrows: { to: { enabled: true, scaleFactor: 0.9 } },
           width: 4,
           color: { color: '#ff007f', highlight: '#ff007f' },
-          smooth: { enabled: true, type: 'horizontal', roundness: 0.08 },
+          smooth: { enabled: true, type: 'curvedCW', roundness: Math.min(0.18, Math.abs(nextBranchCenter - branchCenter) / 4000) },
         });
       }
+
+      branchCursor += branchWidth + chordGap;
     });
 
-    return { nodes, edges, scaleUsage, modeUsage, noteUsage };
+    return { nodes, edges, scaleUsage, modeUsage, noteUsage, totalWidth };
   }, [selectedProgression, progressionSteps, preferFlats]);
 
   const isSubset = (subset, superset) => subset.every((value) => superset.includes(value));
@@ -539,7 +572,16 @@ const MatchesNetworkDiagram = () => {
     networkRef.current = network;
     network.on('click', (params) => setSelectedNodeId(params.nodes[0] || null));
     setTimeout(() => {
-      if (networkRef.current) networkRef.current.fit({ animation: false });
+      if (networkRef.current) {
+        networkRef.current.fit({ animation: false });
+        if (progressionMode) {
+          const fittedScale = networkRef.current.getScale();
+          networkRef.current.moveTo({
+            scale: Math.min(fittedScale * 1.05, 1),
+            animation: { duration: 250, easingFunction: 'easeInOutQuad' },
+          });
+        }
+      }
     }, 0);
     return () => {
       if (networkRef.current) networkRef.current.destroy();
@@ -659,12 +701,22 @@ const MatchesNetworkDiagram = () => {
               </Box>
             )}
             {physicsActive && !selectedProgression && layoutMode !== 'poster' && <Slider value={springLength} min={80} max={300} onChange={(event, value) => setSpringLength(value)} />}
-            <Box ref={containerRef} sx={{ width: '100%', height: selectedProgression ? 760 : 650, border: '3px solid var(--brutal-ink)', bgcolor: 'var(--brutal-paper)' }} />
+            <Box
+              ref={containerRef}
+              sx={{
+                width: '100%',
+                height: selectedProgression ? 820 : 650,
+                border: '3px solid var(--brutal-ink)',
+                bgcolor: 'var(--brutal-paper)',
+                cursor: 'grab',
+                '&:active': { cursor: 'grabbing' },
+              }}
+            />
           </BrutalCard>
         </Grid>
 
         <Grid item xs={12} lg={3.5}>
-          <BrutalCard sx={{ minHeight: selectedProgression ? 760 : 650 }}>
+          <BrutalCard sx={{ minHeight: selectedProgression ? 820 : 650 }}>
             {selectedNode ? (
               <>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -684,13 +736,15 @@ const MatchesNetworkDiagram = () => {
                 <Typography sx={{ fontWeight: 900 }}>Chords: {progressionSteps.length}</Typography>
                 <Typography sx={{ fontWeight: 900 }}>Distinct notes: {progressionUnion.length}</Typography>
                 <Typography sx={{ fontWeight: 900 }}>Common notes: {progressionIntersection.length}</Typography>
+                <Typography sx={{ fontWeight: 900 }}>Parent-scale nodes: {Object.values(progressionWorkflow?.scaleUsage || {}).reduce((total, count) => total + count, 0)}</Typography>
+                <Typography sx={{ fontWeight: 900 }}>Mode nodes: {Object.values(progressionWorkflow?.modeUsage || {}).reduce((total, count) => total + count, 0)}</Typography>
                 <Divider sx={{ borderBottomWidth: 3, borderColor: 'var(--brutal-ink)' }} />
                 <Typography sx={{ fontWeight: 900 }}>Most used notes</Typography>
                 {sortedUsage(progressionWorkflow?.noteUsage).slice(0, 8).map(([note, count]) => <Typography key={note} sx={{ fontWeight: 700 }}>{getNoteName(Number(note), preferFlats)} — {count} chord{count === 1 ? '' : 's'}</Typography>)}
                 <Typography sx={{ fontWeight: 900, mt: 2 }}>Most reused parent scales</Typography>
-                {sortedUsage(progressionWorkflow?.scaleUsage).slice(0, 8).map(([name, count]) => <Typography key={name} sx={{ fontWeight: 700 }}>{name} — {count}</Typography>)}
+                {sortedUsage(progressionWorkflow?.scaleUsage).slice(0, 10).map(([name, count]) => <Typography key={name} sx={{ fontWeight: 700 }}>{name} — {count}</Typography>)}
                 <Typography sx={{ fontWeight: 900, mt: 2 }}>Most reusable modes</Typography>
-                {sortedUsage(progressionWorkflow?.modeUsage).slice(0, 8).map(([name, count]) => <Typography key={name} sx={{ fontWeight: 700 }}>{name} — {count}</Typography>)}
+                {sortedUsage(progressionWorkflow?.modeUsage).slice(0, 10).map(([name, count]) => <Typography key={name} sx={{ fontWeight: 700 }}>{name} — {count}</Typography>)}
               </>
             ) : (
               <>
