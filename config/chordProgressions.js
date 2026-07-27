@@ -102,6 +102,7 @@ const BASE_PROGRESSIONS = [
 ];
 
 const song = (title, artist, key, url) => ({ title, artist, key, url });
+const songLabel = ({ title, artist, key }) => `${title} — ${artist}${key ? ` (${key})` : ''}`;
 
 const SONG_EXAMPLES = {
   'I–V–vi–IV': [
@@ -186,13 +187,17 @@ export function parseRomanToken(token) {
   return { semitones, quality, roman: token };
 }
 
-export const CHORD_PROGRESSIONS = BASE_PROGRESSIONS.map(([name, numerals], index) => ({
-  id: `progression-${index + 1}`,
-  name,
-  numerals,
-  songs: SONG_EXAMPLES[name] || DEFAULT_SONGS,
-  chords: numerals.map(parseRomanToken),
-}));
+export const CHORD_PROGRESSIONS = BASE_PROGRESSIONS.map(([name, numerals], index) => {
+  const songMetadata = SONG_EXAMPLES[name] || DEFAULT_SONGS;
+  return {
+    id: `progression-${index + 1}`,
+    name,
+    numerals,
+    songs: songMetadata.map(songLabel),
+    songMetadata,
+    chords: numerals.map(parseRomanToken),
+  };
+});
 
 export function progressionInKey(progression, keyIndex, getNoteName, preferFlats) {
   return progression.chords.map((chord) => ({
