@@ -108,9 +108,8 @@ const QUALITY_SUFFIX = {
   b9: '7b9', alt: '7#5', mMaj7: 'minMaj7', Maj7: 'M7'
 };
 
-function parseRomanToken(token) {
-  const slashParts = token.split('/');
-  const main = slashParts[0];
+export function parseRomanToken(token) {
+  const main = token.split('/')[0];
   const accidental = main.match(/^[b#]+/)?.[0] || '';
   const roman = main.match(/[ivIV]+/)?.[0] || 'I';
   const suffix = main.slice(accidental.length + roman.length);
@@ -121,13 +120,12 @@ function parseRomanToken(token) {
   const isMinor = roman === roman.toLowerCase();
   let quality = QUALITY_SUFFIX[suffix];
   if (!quality) {
-    if (suffix.startsWith('maj7')) quality = 'M7';
-    else if (suffix.startsWith('Maj7')) quality = 'M7';
-    else if (suffix.startsWith('m7')) quality = suffix.includes('b5') ? 'min7b5' : 'min7';
-    else if (suffix.startsWith('7')) quality = suffix.includes('b9') ? '7b9' : suffix.includes('alt') ? '7#5' : '7';
+    if (/^maj7/i.test(suffix)) quality = 'M7';
+    else if (/^m7/i.test(suffix)) quality = suffix.includes('b5') ? 'min7b5' : 'min7';
+    else if (/^7/.test(suffix)) quality = suffix.includes('b9') ? '7b9' : suffix.includes('alt') ? '7#5' : '7';
     else if (suffix.includes('ø')) quality = 'min7b5';
     else if (suffix.includes('°7')) quality = 'dim7';
-    else if (suffix.includes('°')) quality = 'dim';
+    else if (suffix.includes('°') || suffix.includes('dim')) quality = 'dim';
     else if (suffix.includes('6')) quality = '6';
     else quality = isMinor ? 'min' : 'M';
   }
@@ -146,5 +144,14 @@ export function progressionInKey(progression, keyIndex, getNoteName, preferFlats
     ...chord,
     rootIndex: (keyIndex + chord.semitones) % 12,
     label: `${getNoteName((keyIndex + chord.semitones) % 12, preferFlats)}${chord.quality === 'M' ? '' : chord.quality}`,
+  }));
+}
+
+export function progressionOnTonic(progression, keyIndex, getNoteName, preferFlats) {
+  const tonic = getNoteName(keyIndex, preferFlats);
+  return progression.chords.map((chord) => ({
+    ...chord,
+    rootIndex: keyIndex,
+    label: `${tonic}${chord.quality === 'M' ? '' : chord.quality}`,
   }));
 }
