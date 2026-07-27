@@ -107,6 +107,10 @@ const INTERVAL_TO_SEMITONES = {
   b9:1, '9':2, '#9':3, '11':5, '#11':6, '13':9,
 };
 
+const MIN_ZOOM = 0.35;
+const MAX_ZOOM = 1.2;
+const PAN_PADDING = 50;
+
 const MatchesNetworkDiagram = () => {
   const [selectedKeyIndex, setSelectedKeyIndex] = useState(0);
   const [colorMode, setColorMode] = useState('category');
@@ -133,6 +137,7 @@ const MatchesNetworkDiagram = () => {
   const edgesDataSetRef = useRef(null);
   const physicsActiveRef = useRef(physicsActive);
   const springLengthRef = useRef(springLength);
+  const cameraGuardRef = useRef(false);
   physicsActiveRef.current = physicsActive;
   springLengthRef.current = springLength;
 
@@ -312,119 +317,79 @@ const MatchesNetworkDiagram = () => {
       const chordId = `progression_chord_${stepIndex}`;
       nodes.push({
         id: chordId,
-        label: `${stepIndex + 1}. ${step.roman}\n${step.label}`,
-        type: 'progression-chord',
+        label: `${step.index + 1}. ${step.roman}: ${step.label}`,
+        type: 'chord',
         name: step.label,
         notes: step.notes,
         intervals: step.chordData.intervals || [],
-        description: `Step ${stepIndex + 1} of ${selectedProgression.name}.`,
+        description: `${step.roman} chord in ${selectedKey}: ${step.label}`,
         x: branchCenter,
         y: chordY,
         fixed: { x: true, y: true },
         shape: 'box',
-        margin: 20,
-        widthConstraint: { minimum: 170, maximum: 220 },
-        heightConstraint: { minimum: 82 },
+        margin: 12,
         borderWidth: 4,
-        color: { background: '#fef08a', border: '#1a1a1a', highlight: { background: '#ff007f', border: '#1a1a1a' } },
-        font: { size: 18, face: 'Open Sans, sans-serif', color: '#1a1a1a', bold: true, multi: true },
-        shadow: { enabled: true, color: '#1a1a1a', size: 0, x: 5, y: 5 },
+        color: { background: '#fef08a', border: 'var(--brutal-ink)', highlight: { background: '#ff007f', border: 'var(--brutal-ink)' } },
+        font: { size: 17, face: 'Open Sans, sans-serif', color: '#1a1a1a', bold: true },
+        shadow: { enabled: true, color: 'var(--brutal-ink)', size: 0, x: 4, y: 4 },
       });
 
       let scaleCursor = branchCursor;
       compatibleScales.forEach((entry, scaleIndex) => {
         const scaleWidth = scaleWidths[scaleIndex];
         const scaleCenter = scaleCursor + scaleWidth / 2;
-        const scaleId = `progression_scale_${stepIndex}_${entry.scaleKey}`;
-        const scaleLabel = `${getNoteName(step.rootIndex, preferFlats)} ${entry.scale.name || entry.scaleKey}`;
-        scaleUsage[scaleLabel] = (scaleUsage[scaleLabel] || 0) + 1;
-
+        const scaleId = `progression_${stepIndex}_scale_${entry.scaleKey}`;
+        const scaleName = `${getNoteName(step.rootIndex, preferFlats)} ${entry.scale.name || entry.scaleKey}`;
+        scaleUsage[scaleName] = (scaleUsage[scaleName] || 0) + 1;
         nodes.push({
           id: scaleId,
-          label: scaleLabel,
-          type: 'progression-scale',
-          name: scaleLabel,
+          label: scaleName,
+          type: 'scale',
+          name: scaleName,
           notes: entry.notes,
           intervals: entry.scale.intervals || [],
-          description: `Parent scale compatible with ${step.label}.`,
+          description: `${scaleName} contains every note of ${step.label}.`,
           x: scaleCenter,
           y: scaleY,
           fixed: { x: true, y: true },
           shape: 'box',
-          margin: 14,
-          widthConstraint: { minimum: 145, maximum: 190 },
-          heightConstraint: { minimum: 58 },
+          margin: 10,
           borderWidth: 3,
-          color: { background: '#99f6e4', border: '#1a1a1a', highlight: { background: '#2dd4bf', border: '#1a1a1a' } },
+          color: { background: '#99f6e4', border: 'var(--brutal-ink)', highlight: { background: '#ff007f', border: 'var(--brutal-ink)' } },
           font: { size: 14, face: 'Open Sans, sans-serif', color: '#1a1a1a', bold: true },
-          shadow: { enabled: true, color: '#1a1a1a', size: 0, x: 4, y: 4 },
+          shadow: { enabled: true, color: 'var(--brutal-ink)', size: 0, x: 4, y: 4 },
         });
+        edges.push({ id: `edge_${scaleId}_${chordId}`, from: scaleId, to: chordId, width: 2, color: { color: 'rgba(26,26,26,0.28)', highlight: '#ff007f' } });
 
-        edges.push({
-          id: `edge_${chordId}_${scaleId}`,
-          from: chordId,
-          to: scaleId,
-          arrows: { to: { enabled: true, scaleFactor: 0.72 } },
-          width: 2.6,
-          color: { color: '#1a1a1a', highlight: '#ff007f' },
-          smooth: { enabled: true, type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.14 },
-        });
-
-        const modeCount = entry.playableModes.length;
-        const modeSpan = Math.max(0, (modeCount - 1) * 145);
-        entry.playableModes.forEach((modeEntry, modeIndex) => {
-          const modeId = `progression_mode_${stepIndex}_${entry.scaleKey}_${modeEntry.modeIndex}`;
-          const modeLabel = `${getNoteName(step.rootIndex, preferFlats)} ${modeEntry.mode.name}`;
-          modeUsage[modeLabel] = (modeUsage[modeLabel] || 0) + 1;
-          const modeX = scaleCenter - modeSpan / 2 + modeIndex * 145;
-
+        entry.playableModes.forEach(({ mode, modeIndex, notes: modeNotes }, modePosition) => {
+          const modeX = scaleCenter + (modePosition - (entry.playableModes.length - 1) / 2) * 145;
+          const modeId = `progression_${stepIndex}_scale_${entry.scaleKey}_mode_${modeIndex}`;
+          const modeName = `${getNoteName(step.rootIndex, preferFlats)} ${mode.name}`;
+          modeUsage[modeName] = (modeUsage[modeName] || 0) + 1;
           nodes.push({
             id: modeId,
-            label: modeLabel,
-            type: 'progression-mode',
-            name: modeLabel,
-            notes: modeEntry.notes,
-            intervals: modeEntry.mode.intervals || entry.scale.intervals || [],
-            description: `Playable mode above ${scaleLabel} for ${step.label}.`,
+            label: modeName,
+            type: 'scale',
+            modeIndex,
+            name: modeName,
+            notes: modeNotes,
+            intervals: mode.intervals || entry.scale.intervals || [],
+            description: `${modeName} is playable over ${step.label}.`,
             x: modeX,
             y: modeY,
             fixed: { x: true, y: true },
             shape: 'box',
-            margin: 11,
-            widthConstraint: { minimum: 120, maximum: 160 },
-            heightConstraint: { minimum: 48 },
+            margin: 8,
             borderWidth: 3,
-            color: { background: '#e9d5ff', border: '#1a1a1a', highlight: { background: '#c084fc', border: '#1a1a1a' } },
+            color: { background: '#e9d5ff', border: 'var(--brutal-ink)', highlight: { background: '#ff007f', border: 'var(--brutal-ink)' } },
             font: { size: 12, face: 'Open Sans, sans-serif', color: '#1a1a1a', bold: true },
-            shadow: { enabled: true, color: '#1a1a1a', size: 0, x: 3, y: 3 },
+            shadow: { enabled: true, color: 'var(--brutal-ink)', size: 0, x: 4, y: 4 },
           });
-
-          edges.push({
-            id: `edge_${scaleId}_${modeId}`,
-            from: scaleId,
-            to: modeId,
-            arrows: { to: { enabled: true, scaleFactor: 0.65 } },
-            width: 2,
-            color: { color: '#6b21a8', highlight: '#ff007f' },
-            smooth: { enabled: true, type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.12 },
-          });
+          edges.push({ id: `edge_${modeId}_${scaleId}`, from: modeId, to: scaleId, width: 1.5, color: { color: 'rgba(26,26,26,0.2)', highlight: '#ff007f' } });
         });
 
         scaleCursor += scaleWidth + branchGap;
       });
-
-      if (stepIndex < branches.length - 1) {
-        const nextBranchCenter = branchCursor + branchWidth + chordGap + branches[stepIndex + 1].branchWidth / 2;
-        edges.push({
-          id: `edge_progression_${stepIndex}_${stepIndex + 1}`,
-          from: chordId,
-          to: `progression_chord_${stepIndex + 1}`,
-          arrows: { to: { enabled: true, scaleFactor: 0.9 } },
-          width: 4,
-          color: { color: '#ff007f', highlight: '#ff007f' },
-          smooth: { enabled: true, type: 'curvedCW', roundness: Math.min(0.18, Math.abs(nextBranchCenter - branchCenter) / 4000) },
-        });
-      }
 
       branchCursor += branchWidth + chordGap;
     });
@@ -570,7 +535,50 @@ const MatchesNetworkDiagram = () => {
       interaction: { hover: true, zoomView: true, dragView: true, selectConnectedEdges: false },
     });
     networkRef.current = network;
+
+    const constrainCamera = () => {
+      if (cameraGuardRef.current || !containerRef.current) return;
+      const nodeIds = nodesDataSet.getIds();
+      if (!nodeIds.length) return;
+
+      const scale = network.getScale();
+      const boundedScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, scale));
+      const viewPosition = network.getViewPosition();
+      const canvasWidth = containerRef.current.clientWidth;
+      const canvasHeight = containerRef.current.clientHeight;
+      const bounds = network.getBoundingBox(nodeIds[0]);
+      nodeIds.slice(1).forEach((nodeId) => {
+        const box = network.getBoundingBox(nodeId);
+        bounds.left = Math.min(bounds.left, box.left);
+        bounds.right = Math.max(bounds.right, box.right);
+        bounds.top = Math.min(bounds.top, box.top);
+        bounds.bottom = Math.max(bounds.bottom, box.bottom);
+      });
+
+      const halfWidth = canvasWidth / (2 * boundedScale);
+      const halfHeight = canvasHeight / (2 * boundedScale);
+      const padding = PAN_PADDING / boundedScale;
+      const minX = bounds.left - padding + halfWidth;
+      const maxX = bounds.right + padding - halfWidth;
+      const minY = bounds.top - padding + halfHeight;
+      const maxY = bounds.bottom + padding - halfHeight;
+      const boundedX = minX > maxX ? (bounds.left + bounds.right) / 2 : Math.min(maxX, Math.max(minX, viewPosition.x));
+      const boundedY = minY > maxY ? (bounds.top + bounds.bottom) / 2 : Math.min(maxY, Math.max(minY, viewPosition.y));
+
+      if (
+        Math.abs(boundedScale - scale) > 0.001 ||
+        Math.abs(boundedX - viewPosition.x) > 0.5 ||
+        Math.abs(boundedY - viewPosition.y) > 0.5
+      ) {
+        cameraGuardRef.current = true;
+        network.moveTo({ position: { x: boundedX, y: boundedY }, scale: boundedScale, animation: false });
+        requestAnimationFrame(() => { cameraGuardRef.current = false; });
+      }
+    };
+
     network.on('click', (params) => setSelectedNodeId(params.nodes[0] || null));
+    network.on('zoom', constrainCamera);
+    network.on('dragEnd', constrainCamera);
     setTimeout(() => {
       if (networkRef.current) {
         networkRef.current.fit({ animation: false });
@@ -581,9 +589,12 @@ const MatchesNetworkDiagram = () => {
             animation: { duration: 250, easingFunction: 'easeInOutQuad' },
           });
         }
+        constrainCamera();
       }
     }, 0);
     return () => {
+      network.off('zoom', constrainCamera);
+      network.off('dragEnd', constrainCamera);
       if (networkRef.current) networkRef.current.destroy();
       networkRef.current = null;
     };
