@@ -101,18 +101,57 @@ const BASE_PROGRESSIONS = [
   ['i–iiø7–V7b9–i', ['i','iiø7','V7b9','i']]
 ];
 
+const song = (title, artist, key, url) => ({ title, artist, key, url });
+
 const SONG_EXAMPLES = {
-  'I–V–vi–IV': ['Let It Be — The Beatles', 'No Woman, No Cry — Bob Marley', "Don't Stop Believin' — Journey"],
-  'vi–IV–I–V': ['Someone Like You — Adele', 'I Want It That Way — Backstreet Boys', 'Demons — Imagine Dragons'],
-  'ii–V–I': ['Autumn Leaves — Joseph Kosma', 'Blue Bossa — Kenny Dorham', 'Satin Doll — Duke Ellington'],
-  'ii7–V7–Imaj7': ['Fly Me to the Moon — Bart Howard', 'There Will Never Be Another You — Harry Warren', 'All the Things You Are — Jerome Kern'],
-  'I7–IV7–I7–V7': ['Pride and Joy — Stevie Ray Vaughan', 'Sweet Home Chicago — Robert Johnson', 'Hound Dog — Big Mama Thornton'],
-  'i7–iv7–i7–V7': ['The Thrill Is Gone — B.B. King', 'St. James Infirmary — traditional', 'Summertime — George Gershwin'],
-  'i–bVII–bVI–V': ['Hit the Road Jack — Percy Mayfield', 'Misirlou — traditional', 'Sultans of Swing — Dire Straits'],
-  'i–VI–III–VII': ['Despacito — Luis Fonsi', 'Numb — Linkin Park', 'In the End — Linkin Park'],
+  'I–V–vi–IV': [
+    song('Let It Be', 'The Beatles', 'C', 'https://www.youtube.com/watch?v=QDYfEBY9NM4'),
+    song('No Woman, No Cry', 'Bob Marley & The Wailers', 'C', 'https://www.youtube.com/watch?v=jGqrvn3q1oo'),
+    song("Don't Stop Believin'", 'Journey', 'E', 'https://www.youtube.com/watch?v=1k8craCGpgs'),
+  ],
+  'vi–IV–I–V': [
+    song('Someone Like You', 'Adele', 'A', 'https://www.youtube.com/watch?v=hLQl3WQQoQ0'),
+    song('I Want It That Way', 'Backstreet Boys', 'F#', 'https://www.youtube.com/watch?v=4fndeDfaWCg'),
+    song('Demons', 'Imagine Dragons', 'D#', 'https://www.youtube.com/watch?v=mWRsgZuwf_8'),
+  ],
+  'ii–V–I': [
+    song('Autumn Leaves', 'Joseph Kosma', 'G', 'https://www.youtube.com/watch?v=Gnp58oepHUQ'),
+    song('Blue Bossa', 'Kenny Dorham', 'C', 'https://www.youtube.com/watch?v=6sr7BXinJMw'),
+    song('Satin Doll', 'Duke Ellington', 'C', 'https://www.youtube.com/watch?v=wTFPV1pk654'),
+  ],
+  'ii7–V7–Imaj7': [
+    song('Fly Me to the Moon', 'Frank Sinatra', 'C', 'https://www.youtube.com/watch?v=ZEcqHA7dbwM'),
+    song('There Will Never Be Another You', 'Chet Baker', 'D#', 'https://www.youtube.com/watch?v=3xpcBxjiVHE'),
+    song('All the Things You Are', 'Jerome Kern', 'G#', 'https://www.youtube.com/watch?v=3WbQn5E4uV0'),
+  ],
+  'I7–IV7–I7–V7': [
+    song('Pride and Joy', 'Stevie Ray Vaughan', 'E', 'https://www.youtube.com/watch?v=kfjXp4KTTY8'),
+    song('Sweet Home Chicago', 'Robert Johnson', 'E', 'https://www.youtube.com/watch?v=O8hqGu-leFc'),
+    song('Hound Dog', 'Big Mama Thornton', 'C', 'https://www.youtube.com/watch?v=yoHDrzw-RPg'),
+  ],
+  'i7–iv7–i7–V7': [
+    song('The Thrill Is Gone', 'B.B. King', 'B', 'https://www.youtube.com/watch?v=oica5jG7FpU'),
+    song('St. James Infirmary', 'Louis Armstrong', 'D', 'https://www.youtube.com/watch?v=QzcpUdBw7gs'),
+    song('Summertime', 'Ella Fitzgerald & Louis Armstrong', 'A', 'https://www.youtube.com/watch?v=2HJCN3upMHE'),
+  ],
+  'i–bVII–bVI–V': [
+    song('Hit the Road Jack', 'Ray Charles', 'G#', 'https://www.youtube.com/watch?v=SrnWp5O0DEs'),
+    song('Misirlou', 'Dick Dale', 'E', 'https://www.youtube.com/watch?v=V4eEqN4HY7Q'),
+    song('Sultans of Swing', 'Dire Straits', 'D', 'https://www.youtube.com/watch?v=h0ffIJ7ZO4U'),
+  ],
+  'i–VI–III–VII': [
+    song('Despacito', 'Luis Fonsi', 'B', 'https://www.youtube.com/watch?v=kJQP7kiw5Fk'),
+    song('Numb', 'Linkin Park', 'F#', 'https://www.youtube.com/watch?v=kXYiU_JCYtU'),
+    song('In the End', 'Linkin Park', 'D#', 'https://www.youtube.com/watch?v=eVTXPUF4Oz4'),
+  ],
 };
 
-const DEFAULT_SONGS = ['Representative standard', 'Common popular song', 'Traditional or regional example'];
+const DEFAULT_SONGS = [
+  song('C Jam Blues', 'Duke Ellington', 'C', 'https://www.youtube.com/watch?v=gOlpcJhNyDI'),
+  song('Stand by Me', 'Ben E. King', 'A', 'https://www.youtube.com/watch?v=hwZNL7QVJjE'),
+  song('House of the Rising Sun', 'The Animals', 'A', 'https://www.youtube.com/watch?v=N4bFqW_eu2I'),
+];
+
 const DEGREE_TO_SEMITONES = { I:0, II:2, III:4, IV:5, V:7, VI:9, VII:11 };
 const QUALITY_SUFFIX = {
   m: 'min', maj7: 'M7', '7': '7', m7: 'min7', '6': '6',
