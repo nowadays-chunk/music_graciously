@@ -115,7 +115,7 @@ const SONG_EXAMPLES = {
 const DEFAULT_SONGS = ['Representative standard', 'Common popular song', 'Traditional or regional example'];
 const DEGREE_TO_SEMITONES = { I:0, II:2, III:4, IV:5, V:7, VI:9, VII:11 };
 const QUALITY_SUFFIX = {
-  '': 'M', m: 'min', maj7: 'M7', '7': '7', m7: 'min7', '6': '6',
+  m: 'min', maj7: 'M7', '7': '7', m7: 'min7', '6': '6',
   '°': 'dim', '°7': 'dim7', 'ø7': 'min7b5', m7b5: 'min7b5',
   b9: '7b9', alt: '7#5', mMaj7: 'minMaj7', Maj7: 'M7'
 };
@@ -129,18 +129,21 @@ export function parseRomanToken(token) {
   let semitones = DEGREE_TO_SEMITONES[upperRoman] ?? 0;
   for (const char of accidental) semitones += char === 'b' ? -1 : 1;
   semitones = (semitones + 12) % 12;
+
   const isMinor = roman === roman.toLowerCase();
-  let quality = QUALITY_SUFFIX[suffix];
-  if (!quality) {
-    if (/^maj7/i.test(suffix)) quality = 'M7';
-    else if (/^m7/i.test(suffix)) quality = suffix.includes('b5') ? 'min7b5' : 'min7';
-    else if (/^7/.test(suffix)) quality = suffix.includes('b9') ? '7b9' : suffix.includes('alt') ? '7#5' : '7';
-    else if (suffix.includes('ø')) quality = 'min7b5';
-    else if (suffix.includes('°7')) quality = 'dim7';
-    else if (suffix.includes('°') || suffix.includes('dim')) quality = 'dim';
-    else if (suffix.includes('6')) quality = '6';
-    else quality = isMinor ? 'min' : 'M';
-  }
+  let quality;
+
+  if (suffix === '') quality = isMinor ? 'min' : 'M';
+  else if (QUALITY_SUFFIX[suffix]) quality = QUALITY_SUFFIX[suffix];
+  else if (/^maj7/i.test(suffix)) quality = isMinor ? 'minMaj7' : 'M7';
+  else if (/^m7/i.test(suffix)) quality = suffix.includes('b5') ? 'min7b5' : 'min7';
+  else if (/^7/.test(suffix)) quality = suffix.includes('b9') ? '7b9' : suffix.includes('alt') ? '7#5' : '7';
+  else if (suffix.includes('ø')) quality = 'min7b5';
+  else if (suffix.includes('°7')) quality = 'dim7';
+  else if (suffix.includes('°') || suffix.includes('dim')) quality = 'dim';
+  else if (suffix.includes('6')) quality = isMinor ? 'min6' : '6';
+  else quality = isMinor ? 'min' : 'M';
+
   return { semitones, quality, roman: token };
 }
 
